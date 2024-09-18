@@ -1,3 +1,5 @@
+use rtr_tutorial::hello;
+
 fn main() {
-    println!("Hello, world!");
+    hello();
 }
