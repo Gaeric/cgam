@@ -1,10 +1,12 @@
 use winit::{
-    event::{DeviceEvent, ElementState, Event, KeyEvent, WindowEvent}, event_loop::EventLoop, keyboard::{KeyCode, PhysicalKey}, window::{Window, WindowBuilder}
+    event::WindowEvent,
+    event_loop::EventLoop,
+    window::{Window, WindowBuilder},
 };
 
-use rtr_tutorial::hello;
+use common::State;
 
-struct State<'a> {
+struct PhongState<'a> {
     surface: wgpu::Surface<'a>,
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -16,7 +18,7 @@ struct State<'a> {
     window: &'a Window,
 }
 
-impl<'a> State<'a> {
+impl<'a> PhongState<'a> {
     async fn new(window: &'a Window) -> anyhow::Result<Self> {
         let size = window.inner_size();
 
@@ -82,7 +84,9 @@ impl<'a> State<'a> {
             size,
         })
     }
+}
 
+impl State for PhongState<'_> {
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor {
@@ -124,7 +128,7 @@ impl<'a> State<'a> {
         Ok(())
     }
 
-    fn input(&self, _event: &WindowEvent) -> bool {
+    fn input(&mut self, _event: &WindowEvent) -> bool {
         false
     }
 
@@ -138,73 +142,24 @@ impl<'a> State<'a> {
         }
     }
 
-    fn update(&mut self) {
-        
+    fn update(&mut self) {}
+
+    fn window(&self) -> &Window {
+        self.window
+    }
+
+    fn size(&mut self) -> winit::dpi::PhysicalSize<u32> {
+        self.size
     }
 }
 
-async fn run() {
-    println!("hello world");
-
-    env_logger::init();
-
+async fn exec() {
     let event_loop = EventLoop::new().unwrap();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
-
-    log::info!("window create");
-    println!("window create");
-
-    let mut state = State::new(&window).await.unwrap();
-    // let mut last_render_time = instant::Instant::now();
-
-    let _ = event_loop
-        .run(move |event, control_flow| match event {
-            Event::DeviceEvent {
-                event: DeviceEvent::MouseMotion { delta },
-                ..
-            } => {
-                log::debug!("delta is {delta:?}");
-                // handle mouse event
-            }
-            Event::WindowEvent { window_id, event } if window_id == state.window.id() => {
-                if !state.input(&event) {
-                    match event {
-                        WindowEvent::CloseRequested | WindowEvent::KeyboardInput {
-                            event: KeyEvent {
-                                state: ElementState::Pressed,
-                                physical_key: PhysicalKey::Code(KeyCode::Escape),
-                                ..
-                            },
-                            ..
-                        } => control_flow.exit(),
-                        WindowEvent::Resized(physical_size) => {
-                            log::info!("physical size: {physical_size:?}");
-                            state.resize(physical_size);
-                        }
-                        WindowEvent::RedrawRequested => {
-                            state.update();
-                            match state.render() {
-                                Ok(_) => {}
-                                Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
-                                    state.resize(state.size)
-                                }
-                                Err(wgpu::SurfaceError::OutOfMemory) => control_flow.exit(),
-                                Err(wgpu::SurfaceError::Timeout) => log::warn!("surface timeout"),
-                            }
-                        }
-                        _ => {}
-                    }
-                } else {
-                    state.window.request_redraw();
-                }
-            }
-            _ => {
-                log::info!("event run");
-            }
-        })
-        .unwrap();
+    let mut state = PhongState::new(&window).await.unwrap();
+    common::run(&mut state, event_loop).await;
 }
 
 fn main() {
-    pollster::block_on(run());
+    pollster::block_on(exec());
 }

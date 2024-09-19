@@ -4,9 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["phong"]
+members = [ "common","phong"]
 
 [dependencies]
+anyhow = "1.0"
 pollster = "0.3.0"
 
 [build-dependencies]
