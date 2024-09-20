@@ -503,7 +503,7 @@ dependencies = [
  "bytemuck",
  "cgmath",
  "env_logger 0.11.5",
- "image 0.25.2",
+ "image",
  "instant",
  "log",
  "tobj 4.0.2",
@@ -971,20 +971,6 @@ dependencies = [
  "block2",
  "dispatch",
  "objc2",
-]
-
-[[package]]
-name = "image"
-version = "0.24.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5690139d2f55868e080017335e4b94cb7414274c74f1669c84fb5feba2c9f69d"
-dependencies = [
- "bytemuck",
- "byteorder",
- "color_quant",
- "jpeg-decoder",
- "num-traits",
- "png",
 ]
 
 [[package]]
@@ -1535,21 +1521,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
-name = "phong"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bytemuck",
- "cgmath",
- "common",
- "env_logger 0.10.2",
- "image 0.24.9",
- "log",
- "wgpu",
- "winit",
-]
-
-[[package]]
 name = "pin-project-lite"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1873,14 +1844,18 @@ name = "rtr_tutorial"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bytemuck",
  "cfg-if",
+ "cgmath",
  "common",
+ "env_logger 0.10.2",
  "fs_extra",
  "glob",
  "instant",
- "phong",
+ "log",
  "pollster",
  "tobj 3.2.5",
+ "wgpu",
  "winit",
 ]
 
