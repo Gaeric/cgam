@@ -5,8 +5,11 @@ use winit::{
 };
 
 mod state;
+mod resources;
+mod texture;
 
 pub use state::State;
+
 
 pub fn hello() {
     println!("Hello, world!");
