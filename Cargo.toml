@@ -9,6 +9,12 @@ members = [ "common","phong"]
 [dependencies]
 anyhow = "1.0"
 pollster = "0.3.0"
+common = {path = "./common/"}
+phong = {path = "./phong/"}
+winit = { version = "0.29", features = ["rwh_05"] }
+cfg-if= "1"
+tobj = { version = "3.2.0", features = ["async"] }
+instant = "0.1.13"
 
 [build-dependencies]
 anyhow = "1.0"

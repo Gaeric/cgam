@@ -1,12 +1,7 @@
-use winit::{
-    event::WindowEvent,
-    event_loop::EventLoop,
-    window::{Window, WindowBuilder},
-};
-
 use common::State;
+use winit::{event::WindowEvent, window::Window};
 
-struct PhongState<'a> {
+pub struct PhongState<'a> {
     surface: wgpu::Surface<'a>,
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -19,7 +14,7 @@ struct PhongState<'a> {
 }
 
 impl<'a> PhongState<'a> {
-    async fn new(window: &'a Window) -> anyhow::Result<Self> {
+    pub async fn new(window: &'a Window) -> anyhow::Result<Self> {
         let size = window.inner_size();
 
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
@@ -151,15 +146,4 @@ impl State for PhongState<'_> {
     fn size(&mut self) -> winit::dpi::PhysicalSize<u32> {
         self.size
     }
-}
-
-async fn exec() {
-    let event_loop = EventLoop::new().unwrap();
-    let window = WindowBuilder::new().build(&event_loop).unwrap();
-    let mut state = PhongState::new(&window).await.unwrap();
-    common::run(&mut state, event_loop).await;
-}
-
-fn main() {
-    pollster::block_on(exec());
 }
