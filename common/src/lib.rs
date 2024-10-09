@@ -5,10 +5,15 @@ use winit::{
 };
 
 mod state;
-mod resources;
+pub mod resources;
 mod texture;
+pub mod model;
+mod camera;
+pub mod pipeline;
 
 pub use state::State;
+pub use camera::{Camera, Projection, CameraUniform};
+pub use texture::Texture;
 
 
 pub fn hello() {
