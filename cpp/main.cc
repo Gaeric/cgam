@@ -4,7 +4,12 @@
 #include "vec3.h"
 
 color ray_color(const ray& r) {
-    return color(0, 0, 0);
+    vec3 unit_direction = unit_vector(r.direction());
+    // y[-1, 1] => [0, 1]
+    auto a = 0.5 * (unit_direction.y() + 1.0);
+    // std::clog << "\r unit vector: " << unit_direction.x() << " " << unit_direction.y() << " "
+    //           << unit_direction.z() << ", " << "a is " << a << "\n";
+    return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
 }
 
 int main() {
@@ -34,7 +39,17 @@ int main() {
 
     // Calculate the location of the upper left pixel.
     auto viewport_upper_left = camera_center - vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
-    auto pixel00_loc = viewport_u + 0.5 * (pixel_delta_u + pixel_delta_v);
+    auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+    //
+    // pixel00_loc = viewport_upper_left;
+    // std::clog << "\r pixel00_loc is " << pixel00_loc.x() << " " << pixel00_loc.y() << " " << pixel00_loc.z()
+    //           << "\n";
+
+    // std::clog << "\r pixel_delta_u is " << pixel_delta_u.x() << " " << pixel_delta_u.y() << " "
+    //           << pixel_delta_u.z() << "\n";
+    // std::clog << "\r pixel_delta_v is " << pixel_delta_v.x() << " " << pixel_delta_v.y() << " "
+    //           << pixel_delta_v.z() << "\n";
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -44,6 +59,12 @@ int main() {
         for (int i = 0; i < image_width; i++) {
             auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
             auto ray_direction = pixel_center - camera_center;
+
+            // std::clog << "\r pixel_center: " << pixel_center.x() << " " << pixel_center.y() << " "
+            //           << pixel_center.z() << "; "
+            //           << "ray_direction: " << ray_direction.x() << " " << ray_direction.y() << " "
+            //           << ray_direction.z() << "\n";
+
             ray r(camera_center, ray_direction);
 
             color pixel_color = ray_color(r);
