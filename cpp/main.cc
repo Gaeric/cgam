@@ -3,7 +3,20 @@
 #include "ray.h"
 #include "vec3.h"
 
+bool hit_sphere(const point3& center, double radius, const ray& r) {
+    vec3 oc = center - r.origin();
+    auto a = dot(r.direction(), r.direction());
+    auto b = -2.0 * dot(r.direction(), oc);
+    auto c = dot(oc, oc) - radius * radius;
+    auto discriminant = b * b - 4 * a * c;
+    return (discriminant >= 0);
+}
+
 color ray_color(const ray& r) {
+    if (hit_sphere(point3(0, 0, -1), 0.5, r)) {
+        return color(1, 0, 0);
+    }
+
     vec3 unit_direction = unit_vector(r.direction());
     // y[-1, 1] => [0, 1]
     auto a = 0.5 * (unit_direction.y() + 1.0);
@@ -43,7 +56,8 @@ int main() {
 
     //
     // pixel00_loc = viewport_upper_left;
-    // std::clog << "\r pixel00_loc is " << pixel00_loc.x() << " " << pixel00_loc.y() << " " << pixel00_loc.z()
+    // std::clog << "\r pixel00_loc is " << pixel00_loc.x() << " " << pixel00_loc.y() << " " <<
+    // pixel00_loc.z()
     //           << "\n";
 
     // std::clog << "\r pixel_delta_u is " << pixel_delta_u.x() << " " << pixel_delta_u.y() << " "
