@@ -57,12 +57,17 @@ fn vs_main(
         instance.normal_matrix_2
     );
 
-
+    // transform the obj model from obj space to world space
+    // the model position is fixed, any instance has special model_matrix
     let world_position = model_matrix * vec4<f32>(model.position, 1.0);
     var out: VertexOutput;
 
+    // from world space to clip space or NDC(normalized device coordinates)
     out.clip_position = camera.view_proj * world_position;
+
     out.tex_coords = model.tex_coords;
+
+    // use rotation for every instance
     out.world_normal = normalize(normal_matrix * model.normal);
     out.world_tangent = normalize(normal_matrix * model.tangent);
     out.world_bitangent = normalize(normal_matrix * model.bitangent);
