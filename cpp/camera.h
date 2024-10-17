@@ -1,8 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <iostream>
 #include "color.h"
 #include "hittable.h"
+#include "rtweekend.h"
 
 class camera {
    public:
@@ -10,6 +12,8 @@ class camera {
     double aspect_ratio = 1.0;
     // Rendered image width in pixel count
     int image_width = 100;
+    // Count of random samples for each pixel
+    int samples_per_pixel = 10;
 
     /* Public Camera Parameters Here */
     void render(const hittable& world) {
@@ -29,17 +33,12 @@ class camera {
         for (int j = 0; j < image_height; j++) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
-                auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-                auto ray_direction = pixel_center - center;
-
-                // std::clog << "\r pixel_center: " << pixel_center.x() << " " << pixel_center.y() << " "
-                //           << pixel_center.z() << "; "
-                //           << "ray_direction: " << ray_direction.x() << " " << ray_direction.y() << " "
-                //           << ray_direction.z() << "\n";
-
-                ray r(center, ray_direction);
-                color pixel_color = ray_color(r, world);
-                write_color(std::cout, pixel_color);
+                color pixel_color(0, 0, 0);
+                for (int sample = 0; sample < samples_per_pixel; sample++) {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, world);
+                }
+                write_color(std::cout, pixel_samples_scale * pixel_color);
             }
         }
 
@@ -49,6 +48,8 @@ class camera {
    private:
     // Render image height
     int image_height;
+    // Color scale factor for a sum of pixel samples
+    double pixel_samples_scale;
     // Camera center
     point3 center;
     // Location of pixel 0, 0
@@ -63,6 +64,8 @@ class camera {
         // Calculate the image height, and ensure that it's at least 1.
         image_height = int(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
+
+        pixel_samples_scale = 1.0 / samples_per_pixel;
 
         center = point3(0, 0, 0);
 
@@ -103,6 +106,23 @@ class camera {
         // std::clog << "\r unit vector: " << unit_direction.x() << " " << unit_direction.y() << " "
         //           << unit_direction.z() << ", " << "a is " << a << "\n";
         return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
+    }
+
+    ray get_ray(int i, int j) const {
+        // Construct a camera ray originating from the origin and directed at randomly sampled
+        // point around the pixel location i, j
+        auto offset = sample_square();
+        auto pixel_sample =
+            pixel00_loc + ((i + offset.x()) * pixel_delta_u) + ((j + offset.y()) * pixel_delta_v);
+
+        auto ray_origin = center;
+        auto ray_direction = pixel_sample - ray_origin;
+        return ray(ray_origin, ray_direction);
+    }
+
+    vec3 sample_square() const {
+        // Returns the vector to a random point in the [-0.5, -0.5]-[+0.5, +0.5] unit square.
+        return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
 };
 
