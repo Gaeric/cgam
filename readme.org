@@ -1,10 +1,10 @@
-#+title: CGOMW
+#+title: rosw
 #+startup: content
 #+author: Gaeric
 #+HTML_HEAD: <link href="./worg.css" rel="stylesheet" type="text/css">
 #+HTML_HEAD: <link href="/static/css/worg.css" rel="stylesheet" type="text/css">
 #+OPTIONS: ^:{}
-* CGOMW
-  Computer Graphics One More Week
+* rosw
+  Rendering Over Several Weeks
 ** 使用cpp与rust实现rtow
    book链接: https://raytracing.github.io/books/RayTracingInOneWeekend.html
