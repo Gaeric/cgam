@@ -1,7 +1,6 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include <cmath>
 #include "hittable.h"
 #include "interval.h"
 #include "rtweekend.h"
