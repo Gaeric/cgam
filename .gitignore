@@ -1,3 +1,4 @@
 /phong/target/
 /rtow/cpp/build/
 /rtow/rust/target/
+/rtow/rust/*.ppm

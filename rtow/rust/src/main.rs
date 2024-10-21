@@ -1,12 +1,14 @@
 use core::time;
 use std::{io::Write, thread::sleep};
 
+const DELAY_TIME: u64 = 0;
+
 fn main() {
     const IMAGE_WIDTH: i32 = 256;
     const IMAGE_HEIGHT: i32 = 256;
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
-    let ms = time::Duration::from_millis(10);
+    let ms = time::Duration::from_millis(DELAY_TIME);
 
     for j in 0..IMAGE_HEIGHT {
         eprint!("\rScanlines remaining: {}", IMAGE_HEIGHT - j);
