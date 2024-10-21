@@ -1,6 +1,8 @@
 use core::time;
 use std::{io::Write, thread::sleep};
 
+mod vec3;
+
 const DELAY_TIME: u64 = 0;
 
 fn main() {
