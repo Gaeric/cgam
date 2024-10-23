@@ -21,19 +21,39 @@ impl Vec3 {
     }
 
     fn x(self) -> f64 {
-        return self.e[0];
+        self.e[0]
     }
 
     fn y(self) -> f64 {
-        return self.e[1];
+        self.e[1]
     }
 
     fn z(self) -> f64 {
-        return self.e[2];
+        self.e[2]
     }
 
     fn index_mut(&mut self, i: usize) -> &mut f64 {
         &mut self.e[i]
+    }
+
+    fn length_squared(self) -> f64 {
+        self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
+    }
+
+    fn length(self) -> f64 {
+        self.length_squared().sqrt()
+    }
+
+    fn dot(self, v: Vec3) -> f64 {
+        self.e[0] * v.e[0] + self.e[1] * v.e[1] + self.e[2] * v.e[2]
+    }
+
+    fn cross(self, v: Vec3) -> Vec3 {
+        Vec3::new(
+            self.e[1] * v.e[2] - self.e[2] * v.e[1],
+            self.e[2] * v.e[0] - self.e[0] * v.e[2],
+            self.e[0] * v.e[1] - self.e[1] * v.e[0],
+        )
     }
 }
 
