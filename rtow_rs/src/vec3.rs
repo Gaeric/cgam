@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Neg, Sub};
 
+use rand::Rng;
+
 // some code reference glam
 pub struct Vec3 {
     e: [f64; 3],
@@ -55,6 +57,18 @@ impl Vec3 {
             self.e[0] * v.e[1] - self.e[1] * v.e[0],
         )
     }
+
+    fn random(min: f64, max: f64) -> Vec3 {
+        let mut rng = rand::thread_rng();
+        let mut vec3 = Vec3::default();
+
+        for index in 0..3 {
+            let num = min + (max - min) * rng.gen::<f64>();
+            *vec3.index_mut(index) = num;
+        }
+
+        return vec3;
+    }
 }
 
 impl Neg for Vec3 {
@@ -93,6 +107,13 @@ impl Add for Vec3 {
     }
 }
 
+impl Add for &Vec3 {
+    type Output = Vec3;
+    fn add(self, v: &Vec3) -> Vec3 {
+        Vec3::new(self.e[0] + &v.e[0], self.e[1] + &v.e[1], self.e[2] + &v.e[2])
+    }
+}
+
 impl Sub for Vec3 {
     type Output = Vec3;
     fn sub(self, v: Vec3) -> Vec3 {
@@ -110,7 +131,16 @@ impl Mul<Vec3> for f64 {
 
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
-    fn mul(self, t: f64) -> Vec3 {
-        t * self
+    fn mul(self, rhs: f64) -> Self::Output {
+        Vec3::new(self.e[0] * rhs, self.e[1] * rhs, self.e[2] * rhs)
     }
 }
+
+impl Mul<f64> for &Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: f64) -> Self::Output {
+        Vec3::new(self.e[0] * rhs, self.e[1] * rhs, self.e[2] * rhs)
+    }
+}
+
+pub type Point3 = Vec3;

@@ -2,6 +2,7 @@ use core::time;
 use std::{io::Write, thread::sleep};
 
 mod vec3;
+mod ray;
 
 const DELAY_TIME: u64 = 0;
 
