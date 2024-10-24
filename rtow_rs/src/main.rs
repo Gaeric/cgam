@@ -1,8 +1,12 @@
 use core::time;
 use std::{io::Write, thread::sleep};
 
-mod vec3;
+use interval::Interval;
+
+mod color;
+mod interval;
 mod ray;
+mod vec3;
 
 const DELAY_TIME: u64 = 0;
 
@@ -22,9 +26,11 @@ fn main() {
             let g = j as f64 / (IMAGE_WIDTH - 1) as f64;
             let b = 0.0 as f64;
 
-            let ir = (255.99 * r) as u32;
-            let ig = (255.99 * g) as u32;
-            let ib = (255.99 * b) as u32;
+            let intensity = Interval::new(0.0, 0.999);
+
+            let ir = (255.99 * intensity.clamp(r)) as u32;
+            let ig = (255.99 * intensity.clamp(g)) as u32;
+            let ib = (255.99 * intensity.clamp(b)) as u32;
 
             println!("{ir} {ig} {ib}");
         }

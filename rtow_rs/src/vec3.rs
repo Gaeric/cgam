@@ -3,6 +3,7 @@ use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Neg, Sub};
 use rand::Rng;
 
 // some code reference glam
+#[derive(Clone, Copy)]
 pub struct Vec3 {
     e: [f64; 3],
 }
@@ -22,15 +23,15 @@ impl Vec3 {
         self.e[i]
     }
 
-    fn x(self) -> f64 {
+    pub fn x(self) -> f64 {
         self.e[0]
     }
 
-    fn y(self) -> f64 {
+    pub fn y(self) -> f64 {
         self.e[1]
     }
 
-    fn z(self) -> f64 {
+    pub fn z(self) -> f64 {
         self.e[2]
     }
 
