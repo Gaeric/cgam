@@ -1,8 +1,9 @@
 use core::time;
 use std::{io::Write, thread::sleep};
 
-use interval::Interval;
+use color::{write_color, Color};
 
+mod camera;
 mod color;
 mod interval;
 mod ray;
@@ -26,13 +27,9 @@ fn main() {
             let g = j as f64 / (IMAGE_WIDTH - 1) as f64;
             let b = 0.0 as f64;
 
-            let intensity = Interval::new(0.0, 0.999);
+            let pixel_color = Color::new(r, g, b);
 
-            let ir = (255.99 * intensity.clamp(r)) as u32;
-            let ig = (255.99 * intensity.clamp(g)) as u32;
-            let ib = (255.99 * intensity.clamp(b)) as u32;
-
-            println!("{ir} {ig} {ib}");
+            write_color(&pixel_color);
         }
     }
 
