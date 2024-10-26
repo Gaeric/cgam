@@ -16,7 +16,12 @@ class sphere : public hittable {
 
     // Moving Sphere
     sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat)
-        : center(center1, center2 - center1), radius(std::fmax(0, radius)), mat(mat) {}
+    : center(center1, center2 - center1), radius(std::fmax(0, radius)), mat(mat) {
+        auto rvec = vec3(radius, radius, radius);
+        aabb box1(center.at(0) - rvec, center.at(0) + rvec);
+        aabb box2(center.at(1) - rvec, center.at(1) + rvec);
+        bbox = aabb(box1, box2);
+    }
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         point3 current_center = center.at(r.time());
