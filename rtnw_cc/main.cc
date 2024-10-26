@@ -1,11 +1,15 @@
+#include "bvh.h"
 #include "camera.h"
 #include "hittable_list.h"
 #include "material.h"
 #include "rtweekend.h"
 #include "sphere.h"
+#include <chrono>
 
 int main() {
     // World
+    auto start = std::chrono::high_resolution_clock::now();
+    
     hittable_list world;
     auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
     world.add(make_shared<sphere>(point3(0, -1000.0, 0), 1000, ground_material));
@@ -47,6 +51,8 @@ int main() {
     auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
+    world = hittable_list(make_shared<bvh_node>(world));
+
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
@@ -63,4 +69,9 @@ int main() {
     cam.focus_dist = 10.0;
 
     cam.render(world);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> duration = end - start;
+
+    std::clog << "\rescape time: " << duration.count() << " ms" << std::endl;
 }
