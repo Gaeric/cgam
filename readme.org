@@ -70,3 +70,7 @@
    但是，我需要降低这一事件的优先级，因为我需要首先完整的读完这个系列的三本书藉。我希望能整对整个RT过程有一个清晰直观的解决方案后，再来逐步解决过程中的困惑。
 ** rtnw
    book: https://raytracing.github.io/books/RayTracingTheNextWeek.html#overview
+*** bvh
+    采用3.10节bvh划分方法后，渲染时长比3.9节完成的bvh划分后渲染时长更长，这里需要分析问题的原因，并找到bvh划分的良好方法。
+
+    出于项目的进度考虑，在cpp版本中不在此进行深入debug，使用rust重写时再次澄清该节点的问题。
