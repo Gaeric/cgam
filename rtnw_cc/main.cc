@@ -1,3 +1,5 @@
+#include <chrono>
+#include <memory>
 #include "bvh.h"
 #include "camera.h"
 #include "hittable_list.h"
@@ -5,12 +7,9 @@
 #include "rtweekend.h"
 #include "sphere.h"
 #include "texture.h"
-#include <chrono>
 
 void bouncing_spheres() {
     // World
-    auto start = std::chrono::high_resolution_clock::now();
-    
     hittable_list world;
 
     auto checker = make_shared<checker_texture>(0.32, color(.2, .3, .1), color(.9, .9, .9));
@@ -71,13 +70,54 @@ void bouncing_spheres() {
     cam.focus_dist = 10.0;
 
     cam.render(world);
+}
+
+void checkered_spheres() {
+    hittable_list world;
+    auto checker = make_shared<checker_texture>(0.32, color(.2, .3, .1), color(.9, .9, .9));
+    world.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<lambertian>(checker)));
+    world.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<lambertian>(checker)));
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 16;
+    cam.max_depth = 16;
+
+    cam.vfov = 20;
+    cam.lookfrom = point3(13, 2, 3);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(world);
+}
+
+typedef enum {
+    BOUNCING_SPHERES = 0,
+    CHECKERED_SPHERES = 1,
+
+} SCENE;
+
+int main() {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    SCENE scene = CHECKERED_SPHERES;
+    switch (scene) {
+        case BOUNCING_SPHERES:
+            bouncing_spheres();
+            break;
+        case CHECKERED_SPHERES:
+            checkered_spheres();
+            break;
+        default:
+            break;
+    }
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration = end - start;
 
     std::clog << "\rescape time: " << duration.count() << " ms" << std::endl;
-}
-
-int main() {
-    bouncing_spheres();
 }
