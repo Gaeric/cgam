@@ -4,6 +4,7 @@
 #include "material.h"
 #include "rtweekend.h"
 #include "sphere.h"
+#include "texture.h"
 #include <chrono>
 
 int main() {
@@ -11,8 +12,9 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
     
     hittable_list world;
-    auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
-    world.add(make_shared<sphere>(point3(0, -1000.0, 0), 1000, ground_material));
+
+    auto checker = make_shared<checker_texture>(0.32, color(.2, .3, .1), color(.9, .9, .9));
+    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(checker)));
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -57,8 +59,8 @@ int main() {
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 400;
-    cam.samples_per_pixel = 100;
-    cam.max_depth = 8;
+    cam.samples_per_pixel = 16;
+    cam.max_depth = 16;
 
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);
