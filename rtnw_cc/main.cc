@@ -7,7 +7,7 @@
 #include "texture.h"
 #include <chrono>
 
-int main() {
+void bouncing_spheres() {
     // World
     auto start = std::chrono::high_resolution_clock::now();
     
@@ -76,4 +76,8 @@ int main() {
     std::chrono::duration<double, std::milli> duration = end - start;
 
     std::clog << "\rescape time: " << duration.count() << " ms" << std::endl;
+}
+
+int main() {
+    bouncing_spheres();
 }
