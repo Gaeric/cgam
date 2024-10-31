@@ -28,5 +28,5 @@ impl<'a> HitRecord<'a> {
 }
 
 pub trait Hittable {
-    fn hit<'a>(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord<'a>) -> bool;
+    fn hit<'a>(&'a self, r: &Ray, ray_t: Interval, rec: &mut HitRecord<'a>) -> bool;
 }

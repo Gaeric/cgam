@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
 use rand::Rng;
 
@@ -156,6 +156,14 @@ impl Mul<f64> for &Vec3 {
     type Output = Vec3;
     fn mul(self, rhs: f64) -> Self::Output {
         Vec3::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    }
+}
+
+impl Div<f64> for Vec3 {
+    type Output = Vec3;
+    #[inline]
+    fn div(self, rhs: f64) -> Vec3 {
+        return self * (1.0 / rhs);
     }
 }
 

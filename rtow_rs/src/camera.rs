@@ -1,11 +1,13 @@
-use crate::color::Color;
+use crate::color::{write_color, Color};
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
-use crate::material::{Lambertian, Material};
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-struct Camera {
+use core::time;
+use std::{io::Write, thread::sleep};
+
+pub struct Camera {
     pub aspect_ratio: f64,
     pub image_width: u32,
     pub samples_per_pixel: u32,
@@ -16,6 +18,7 @@ struct Camera {
     pub vup: Vec3,
     pub defocus_angle: f64,
     pub focus_dist: f64,
+    pub delay: u64,
 
     /// Render image height
     image_height: u32,
@@ -61,6 +64,8 @@ impl Camera {
             w: Vec3::new(0.0, 0.0, 0.0),
             defocus_disk_u: Vec3::new(0.0, 0.0, 0.0),
             defocus_disk_v: Vec3::new(0.0, 0.0, 0.0),
+
+            delay: 0,
         }
     }
 
@@ -94,6 +99,33 @@ impl Camera {
             }
         }
 
-        Color::new(0.0, 0.0, 0.0)
+        let unit_direction = r.direction().unit();
+        let a = 0.5 * (unit_direction.y() + 1.0);
+        (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0)
+    }
+
+    pub fn render<T: Hittable>(&self, world: T) {
+        const IMAGE_WIDTH: i32 = 256;
+        const IMAGE_HEIGHT: i32 = 256;
+
+        println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+        let ms = time::Duration::from_millis(self.delay);
+
+        for j in 0..IMAGE_HEIGHT {
+            eprint!("\rScanlines remaining: {}", IMAGE_HEIGHT - j);
+            std::io::stderr().flush().unwrap();
+            sleep(ms);
+            for i in 0..IMAGE_WIDTH {
+                let r = i as f64 / (IMAGE_WIDTH - 1) as f64;
+                let g = j as f64 / (IMAGE_WIDTH - 1) as f64;
+                let b = 0.0 as f64;
+
+                let pixel_color = Color::new(r, g, b);
+
+                write_color(&pixel_color);
+            }
+        }
+
+        eprintln!("\rDone.        ");
     }
 }
