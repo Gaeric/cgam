@@ -70,6 +70,14 @@ impl Vec3 {
 
         return vec3;
     }
+
+    pub fn unit(&self) -> Vec3 {
+        Vec3::new(
+            self.x / self.length(),
+            self.y / self.length(),
+            self.z / self.length(),
+        )
+    }
 }
 
 impl Neg for Vec3 {
