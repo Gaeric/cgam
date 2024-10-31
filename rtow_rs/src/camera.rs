@@ -1,3 +1,8 @@
+use crate::color::Color;
+use crate::hittable::{HitRecord, Hittable};
+use crate::interval::Interval;
+use crate::material::{Lambertian, Material};
+use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
 struct Camera {
@@ -59,7 +64,7 @@ impl Camera {
         }
     }
 
-    pub fn initialize(&mut self) {
+    fn initialize(&mut self) {
         let image_height = self.image_width / self.aspect_ratio as u32;
         if image_height < 1 {
             self.image_height = 1;
@@ -69,6 +74,26 @@ impl Camera {
 
         self.pixel_sample_scale = 1.0 / (self.samples_per_pixel as f64);
         self.center = self.lookfrom;
+    }
 
+    fn ray_color<T: Hittable>(r: &mut Ray, depth: i32, world: T) -> Color {
+        if depth <= 0 {
+            return Color::new(0.0, 0.0, 0.0);
+        }
+
+        let mut rec: HitRecord = Default::default();
+        let interval = Interval::new(0.001, std::f64::INFINITY);
+
+        if world.hit(r, interval, &mut rec) {
+            let mut scattered: Ray = Default::default();
+            let mut attenuation: Color = Default::default();
+            if let Some(mat) = rec.mat {
+                if mat.scatter(r, &mut rec, &mut attenuation, &mut scattered) {
+                    return attenuation * Self::ray_color(&mut scattered, depth - 1, world);
+                }
+            }
+        }
+
+        Color::new(0.0, 0.0, 0.0)
     }
 }

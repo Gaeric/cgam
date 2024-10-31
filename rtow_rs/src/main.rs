@@ -8,6 +8,8 @@ mod color;
 mod interval;
 mod ray;
 mod vec3;
+mod hittable;
+mod material;
 
 const DELAY_TIME: u64 = 0;
 

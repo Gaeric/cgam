@@ -3,21 +3,11 @@ use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Neg, Sub};
 use rand::Rng;
 
 // some code reference glam
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct Vec3 {
     x: f64,
     y: f64,
     z: f64,
-}
-
-impl Default for Vec3 {
-    fn default() -> Self {
-        Self {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }
-    }
 }
 
 impl Vec3 {
@@ -49,19 +39,19 @@ impl Vec3 {
         return &mut self.z;
     }
 
-    fn length_squared(self) -> f64 {
+    pub fn length_squared(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    fn length(self) -> f64 {
+    pub fn length(self) -> f64 {
         self.length_squared().sqrt()
     }
 
-    fn dot(self, v: Vec3) -> f64 {
+    pub fn dot(self, v: &Vec3) -> f64 {
         self.x * v.x + self.y * v.y + self.z * v.z
     }
 
-    fn cross(self, v: Vec3) -> Vec3 {
+    pub fn cross(self, v: Vec3) -> Vec3 {
         Vec3::new(
             self.y * v.z - self.z * v.y,
             self.z * v.x - self.x * v.z,
@@ -69,7 +59,7 @@ impl Vec3 {
         )
     }
 
-    fn random(min: f64, max: f64) -> Vec3 {
+    pub fn random(min: f64, max: f64) -> Vec3 {
         let mut rng = rand::thread_rng();
         let mut vec3 = Vec3::default();
 
@@ -137,6 +127,13 @@ impl Mul<Vec3> for f64 {
 
     fn mul(self, v: Vec3) -> Vec3 {
         Vec3::new(self * v.x, self * v.y, self * v.z)
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, v: Vec3) -> Vec3 {
+        Vec3::new(self.x * v.x, self.y * v.y, self.z * v.z)
     }
 }
 
