@@ -75,4 +75,16 @@ class image_texture : public texture {
     rtw_image image;
 };
 
+class noise_texture : public texture {
+   public:
+    noise_texture() {}
+
+    color value(double u, double v, const point3& p) const override {
+        return color(1, 1, 1) * noise.noise(p);
+    }
+
+   private:
+    perlin noise;
+};
+
 #endif
