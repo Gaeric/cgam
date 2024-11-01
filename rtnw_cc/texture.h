@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include "color.h"
+#include "perlin.h"
 #include "rtw_stb_image.h"
 
 class texture {

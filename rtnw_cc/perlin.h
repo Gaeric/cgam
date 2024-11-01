@@ -45,6 +45,6 @@ class perlin {
             p[target] = tmp;
         }
     }
-}
+};
 
 #endif
