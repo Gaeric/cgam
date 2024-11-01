@@ -12,6 +12,16 @@ pub struct Sphere<'a> {
     mat: &'a dyn Material,
 }
 
+impl<'a> Sphere<'a> {
+    pub fn new(center: Point3, radius: f64, mat: &'a dyn Material) -> Self {
+        Self {
+            center: center.clone(),
+            radius,
+            mat,
+        }
+    }
+}
+
 impl<'b> Hittable for Sphere<'b> {
     fn hit<'a>(&'a self, r: &Ray, ray_t: Interval, rec: &mut HitRecord<'a>) -> bool {
         let oc = self.center - *r.origin();

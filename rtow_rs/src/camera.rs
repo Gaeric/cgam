@@ -104,23 +104,29 @@ impl Camera {
         (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0)
     }
 
-    pub fn render<T: Hittable>(&self, world: T) {
+    pub fn render<T: Hittable>(&mut self, world: T) {
         const IMAGE_WIDTH: i32 = 256;
         const IMAGE_HEIGHT: i32 = 256;
+        let ms = time::Duration::from_millis(self.delay);
+
+        self.initialize();
 
         println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
-        let ms = time::Duration::from_millis(self.delay);
 
         for j in 0..IMAGE_HEIGHT {
             eprint!("\rScanlines remaining: {}", IMAGE_HEIGHT - j);
             std::io::stderr().flush().unwrap();
             sleep(ms);
             for i in 0..IMAGE_WIDTH {
-                let r = i as f64 / (IMAGE_WIDTH - 1) as f64;
-                let g = j as f64 / (IMAGE_WIDTH - 1) as f64;
-                let b = 0.0 as f64;
+                let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+                for sample in 0..self.samples_per_pixel {
+                    let r = i as f64 / (IMAGE_WIDTH - 1) as f64;
+                    let g = j as f64 / (IMAGE_WIDTH - 1) as f64;
+                    let b = 0.0 as f64;
+                    pixel_color += Color::new(r, g, b);
+                }
 
-                let pixel_color = Color::new(r, g, b);
+                let pixel_color = pixel_color * self.pixel_sample_scale;
 
                 write_color(&pixel_color);
             }

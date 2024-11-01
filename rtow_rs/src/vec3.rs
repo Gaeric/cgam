@@ -71,6 +71,16 @@ impl Vec3 {
         return vec3;
     }
 
+    pub fn random_random() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        let mut vec3 = Vec3::default();
+        for index in 0..3 {
+            let num = rng.gen::<f64>();
+            *vec3.index_mut(index) = num;
+        }
+        vec3
+    }
+
     pub fn unit(&self) -> Vec3 {
         Vec3::new(
             self.x / self.length(),
