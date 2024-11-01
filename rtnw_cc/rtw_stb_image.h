@@ -35,6 +35,8 @@ class rtw_image {
             return;
         if (load("images/" + filename))
             return;
+        if (load("../images/" + filename))
+            return;
         if (load("../../images/" + filename))
             return;
         if (load("../../../images/" + filename))
