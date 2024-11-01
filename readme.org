@@ -8,60 +8,61 @@
   computer graphics and more
 ** rtow
    book链接: https://raytracing.github.io/books/RayTracingInOneWeekend.html
+   #+begin_example
+      index:
+      2  Output an Image
+      2.1  The PPM Image Format
+      2.2  Creating an Image File
+      2.3  Adding a Progress Indicator
+      3  The vec3 Class
+      3.1  Color Utility Functions
+      4  Rays, a Simple Camera, and Background
+      4.1  The ray Class
+      4.2  Sending Rays Into the Scene
+      5  Adding a Sphere
+      5.1  Ray-Sphere Intersection
+      5.2  Creating Our First Raytraced Image
+      6  Surface Normals and Multiple Objects
+      6.1  Shading with Surface Normals
+      6.2  Simplifying the Ray-Sphere Intersection Code
+      6.3  An Abstraction for Hittable Objects
+      6.4  Front Faces Versus Back Faces
+      6.5  A List of Hittable Objects
+      6.6  Some New C++ Features
+      6.7  Common Constants and Utility Functions
+      6.8  An Interval Class
+      7  Moving Camera Code Into Its Own Class
+      8  Antialiasing
+      8.1  Some Random Number Utilities
+      8.2  Generating Pixels with Multiple Samples
+      9  Diffuse Materials
+      9.1  A Simple Diffuse Material
+      9.2  Limiting the Number of Child Rays
+      9.3  Fixing Shadow Acne
+      9.4  True Lambertian Reflection
+      9.5  Using Gamma Correction for Accurate Color Intensity
+      10  Metal
+      10.1  An Abstract Class for Materials
+      10.2  A Data Structure to Describe Ray-Object Intersections
+      10.3  Modeling Light Scatter and Reflectance
+      10.4  Mirrored Light Reflection
+      10.5  A Scene with Metal Spheres
+      10.6  Fuzzy Reflection
+      11  Dielectrics
+      11.1  Refraction
+      11.2  Snell's Law
+      11.3  Total Internal Reflection
+      11.4  Schlick Approximation
+      11.5  Modeling a Hollow Glass Sphere
+      12  Positionable Camera
+      12.1  Camera Viewing Geometry
+      12.2  Positioning and Orienting the Camera
+      13  Defocus Blur
+      13.1  A Thin Lens Approximation
+      13.2  Generating Sample Rays
+   #+end_example
 
    使用cpp与rust分别实现rtow
-
-   index:
-   2  Output an Image
-   2.1  The PPM Image Format
-   2.2  Creating an Image File
-   2.3  Adding a Progress Indicator
-   3  The vec3 Class
-   3.1  Color Utility Functions
-   4  Rays, a Simple Camera, and Background
-   4.1  The ray Class
-   4.2  Sending Rays Into the Scene
-   5  Adding a Sphere
-   5.1  Ray-Sphere Intersection
-   5.2  Creating Our First Raytraced Image
-   6  Surface Normals and Multiple Objects
-   6.1  Shading with Surface Normals
-   6.2  Simplifying the Ray-Sphere Intersection Code
-   6.3  An Abstraction for Hittable Objects
-   6.4  Front Faces Versus Back Faces
-   6.5  A List of Hittable Objects
-   6.6  Some New C++ Features
-   6.7  Common Constants and Utility Functions
-   6.8  An Interval Class
-   7  Moving Camera Code Into Its Own Class
-   8  Antialiasing
-   8.1  Some Random Number Utilities
-   8.2  Generating Pixels with Multiple Samples
-   9  Diffuse Materials
-   9.1  A Simple Diffuse Material
-   9.2  Limiting the Number of Child Rays
-   9.3  Fixing Shadow Acne
-   9.4  True Lambertian Reflection
-   9.5  Using Gamma Correction for Accurate Color Intensity
-   10  Metal
-   10.1  An Abstract Class for Materials
-   10.2  A Data Structure to Describe Ray-Object Intersections
-   10.3  Modeling Light Scatter and Reflectance
-   10.4  Mirrored Light Reflection
-   10.5  A Scene with Metal Spheres
-   10.6  Fuzzy Reflection
-   11  Dielectrics
-   11.1  Refraction
-   11.2  Snell's Law
-   11.3  Total Internal Reflection
-   11.4  Schlick Approximation
-   11.5  Modeling a Hollow Glass Sphere
-   12  Positionable Camera
-   12.1  Camera Viewing Geometry
-   12.2  Positioning and Orienting the Camera
-   13  Defocus Blur
-   13.1  A Thin Lens Approximation
-   13.2  Generating Sample Rays
 
    我花了许多时间来使用cpp实现一个rtow，花在理解该文所阐述的技术原理的时间要比编码的时间长得多。有很多概念我都需要经过推导才能确性它是可使用的，而且即使现在已经完成了final scene，却仍然部分内容有所存疑，比如Defocus Blur。
 
@@ -75,6 +76,66 @@
 
     出于项目的进度考虑，在cpp版本中不在此进行深入debug，使用rust重写时再次澄清该节点的问题。
 *** perlin noise
-    perlin noise噪声的算法原理没有介绍，此处需要进行深入了解。
+    见于wiki： https://en.wikipedia.org/wiki/Perlin_noise
 
-    perlin噪声的当前效果与例图无法对应，需要在上一条的基础上找到实现中的错误。
+     perlin noise噪声的算法原理没有介绍，此处需要进行深入了解。
+
+     perlin噪声的当前效果与例图无法对应，需要在上一条的基础上找到实现中的错误。
+
+     根据perlin噪声的基本思想，在p点处的噪声值，为其空间中相临整数点的值的线性插值。在该例中，在三维空间中进行计算，于是取了正立方体上的8个顶点，对这8个点进行三线性插值。
+
+     下面来分别拆解noise函数与tralinear_interp三线性插值函数。
+**** noise
+     #+begin_src c-ts
+       double noise(const point3& p) const {
+           auto u = p.x() - std::floor(p.x());
+           auto v = p.y() - std::floor(p.y());
+           auto w = p.z() - std::floor(p.z());
+
+           auto i = int(std::floor(p.x()));
+           auto j = int(std::floor(p.y()));
+           auto k = int(std::floor(p.z()));
+
+           double c[2][2][2];
+
+           for (int di = 0; di < 2; di++) {
+               for (int dj = 0; dj < 2; dj++) {
+                   for (int dk = 0; dk < 2; dk++) {
+                       c[di][dj][dk] = randfloat[perm_x[(i + di) & 255] ^
+                                                 perm_y[(j + dj) & 255] ^
+                                                 perm_z[(k + dk) & 255]];
+                   }
+               }
+           }
+
+           return trilinear_interp(c, u, v, w);
+       }
+     #+end_src
+     noise函数接收某个点P，返回噪声函数在点p处理的值。
+
+     首先拿到点P在-x, -y, -z方向的顶点(i, j, k)，并将该点视为原点(0, 0, 0)，则另外七个顶点分别为：
+     (i, j, k+1), (i, j+1, k), (i, j+1, k+1), (i+1, j, k), (i+1, j, k+1), (i+1, j+1, k), (i+1, j+1, k+1)
+
+     uvw则为点P相对于(i, j, k)的位置。
+     
+     perlin噪声插值在[0, 1]范围内进行插值，首先需要取得8个顶点的值，该实现中这8个点查x, y, z轴的随机数表而得，并存储到三维数组c中。
+
+     随后对根据这8个点对P进行三线性插值。
+**** trilinear_interp
+     #+begin_src c-ts
+       static double trilinear_interp(double c[2][2][2], double u, double v, double w) {
+           auto accum = 0.0;
+           for (int i = 0; i < 2; i++) {
+               for (int j = 0; j < 2; j++) {
+                   for (int k = 0; k < 2; k++) {
+                       accum += (i * u + (1 - i) * (1 - u)) * (j * v + (1 - j) * (1 - v)) *
+                                (k * w + (1 - k) * (1 - w)) * c[i][j][k];
+                   }
+               }
+           }
+           return accum;
+       }
+     #+end_src
+     本例中，三线性插值的插值函数选用是(1 - t)，对于c[0][0][0]点，其在i轴上的差值分量为：i * u + (1-i)*(1-u)
+
+     简单理解：u值越靠近0点，i轴0点对其值的影响越小，i轴1点对其值的影响越大

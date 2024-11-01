@@ -31,7 +31,7 @@ class perlin {
             for (int dj = 0; dj < 2; dj++) {
                 for (int dk = 0; dk < 2; dk++) {
                     c[di][dj][dk] =
-                        randfloat[perm_x[(i + di) & 255] ^ perm_y[(i + dj) & 255] ^ perm_z[(k + dk) & 255]];
+                        randfloat[perm_x[(i + di) & 255] ^ perm_y[(j + dj) & 255] ^ perm_z[(k + dk) & 255]];
                 }
             }
         }
