@@ -11,7 +11,7 @@ pub struct Camera {
     pub aspect_ratio: f64,
     pub image_width: u32,
     pub samples_per_pixel: u32,
-    pub max_depth: u32,
+    pub max_depth: i32,
     pub vfov: f64,
     pub lookfrom: Point3,
     pub lookat: Point3,
@@ -81,7 +81,7 @@ impl Camera {
         self.center = self.lookfrom;
     }
 
-    fn ray_color<T: Hittable>(r: &mut Ray, depth: i32, world: T) -> Color {
+    fn ray_color<T: Hittable>(r: &mut Ray, depth: i32, world: &T) -> Color {
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }
@@ -104,6 +104,23 @@ impl Camera {
         (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0)
     }
 
+    pub fn sample_square() -> Vec3 {
+        Vec3::random_random() - Vec3::new(0.5, 0.5, 0.0)
+    }
+
+    pub fn get_ray(&self, i: i32, j: i32) -> Ray {
+        let offset = Camera::sample_square();
+        let pixel_sample = self.pixel00_loc
+            + ((i as f64 + offset.x()) * self.pixel_delta_u)
+            + ((j as f64 + offset.y()) * self.pixel_delta_v);
+
+        let ray_origin = self.center;
+        // if self.defocus_angle <= 0.0
+        let ray_direction = pixel_sample - ray_origin;
+
+        Ray::new(ray_origin, ray_direction)
+    }
+
     pub fn render<T: Hittable>(&mut self, world: T) {
         const IMAGE_WIDTH: i32 = 256;
         const IMAGE_HEIGHT: i32 = 256;
@@ -120,10 +137,8 @@ impl Camera {
             for i in 0..IMAGE_WIDTH {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for sample in 0..self.samples_per_pixel {
-                    let r = i as f64 / (IMAGE_WIDTH - 1) as f64;
-                    let g = j as f64 / (IMAGE_WIDTH - 1) as f64;
-                    let b = 0.0 as f64;
-                    pixel_color += Color::new(r, g, b);
+                    let mut r = self.get_ray(i, j);
+                    pixel_color += Self::ray_color(&mut r, self.max_depth, &world);
                 }
 
                 let pixel_color = pixel_color * self.pixel_sample_scale;
