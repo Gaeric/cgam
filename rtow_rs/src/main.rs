@@ -1,6 +1,5 @@
 use camera::Camera;
 use color::Color;
-use hittable::Hittable;
 use material::Lambertian;
 use sphere::Sphere;
 use vec3::Point3;
@@ -13,6 +12,7 @@ mod material;
 mod ray;
 mod sphere;
 mod vec3;
+mod rtweekend;
 
 fn main() {
     const DELAY_TIME: u64 = 0;

@@ -2,9 +2,11 @@ use crate::color::{write_color, Color};
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
 use crate::ray::Ray;
+use crate::rtweekend::degress_to_radians;
 use crate::vec3::{Point3, Vec3};
 
 use core::time;
+use std::fs::File;
 use std::{io::Write, thread::sleep};
 
 pub struct Camera {
@@ -79,6 +81,37 @@ impl Camera {
 
         self.pixel_sample_scale = 1.0 / (self.samples_per_pixel as f64);
         self.center = self.lookfrom;
+
+        // Determine viewport dimensions.
+        let theta = degress_to_radians(self.vfov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * self.focus_dist;
+        let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
+
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame;
+        // since we only have the exact OP vector, we cannot describe the rotation around OP(roll).
+        self.w = (self.lookfrom - self.lookat).unit();
+        self.u = self.vup.cross(self.w).unit();
+        self.v = self.w.cross(self.u);
+
+        // Calculate the vectors across the horizontal and down the vertical
+        // Vector across viewport horizontal edge
+        let viewport_u = viewport_width * self.u;
+        // Vector down viewport vectical edge
+        let viewport_v = viewport_height * -self.v;
+
+        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+        self.pixel_delta_u = viewport_u / self.image_width as f64;
+        self.pixel_delta_v = viewport_v / self.image_height as f64;
+
+        // Calculate the location of the upper left pixel.
+        let viewport_upper_left =
+            self.center - (self.focus_dist * self.w) - viewport_u / 2.0 - viewport_v / 2.0;
+        self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
+
+        let defocus_radius = self.focus_dist * (degress_to_radians(self.defocus_angle / 2.0)).tan();
+        self.defocus_disk_u = self.u * defocus_radius;
+        self.defocus_disk_v = self.v * defocus_radius;
     }
 
     fn ray_color<T: Hittable>(r: &mut Ray, depth: i32, world: &T) -> Color {
@@ -114,6 +147,8 @@ impl Camera {
             + ((i as f64 + offset.x()) * self.pixel_delta_u)
             + ((j as f64 + offset.y()) * self.pixel_delta_v);
 
+        eprintln!("offset {:#?}, pixel_sample {:#?}\n", offset, pixel_sample);
+
         let ray_origin = self.center;
         // if self.defocus_angle <= 0.0
         let ray_direction = pixel_sample - ray_origin;
@@ -128,7 +163,9 @@ impl Camera {
 
         self.initialize();
 
-        println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+        let mut file = File::create("output.ppm").unwrap();
+
+        let _ = writeln!(file, "P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
         for j in 0..IMAGE_HEIGHT {
             eprint!("\rScanlines remaining: {}", IMAGE_HEIGHT - j);
@@ -138,12 +175,15 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for sample in 0..self.samples_per_pixel {
                     let mut r = self.get_ray(i, j);
-                    pixel_color += Self::ray_color(&mut r, self.max_depth, &world);
+                    let sample_color = Self::ray_color(&mut r, self.max_depth, &world);
+                    eprintln!("ray {:#?}, sample color: {:#?}", r, sample_color);
+
+                    pixel_color += sample_color;
                 }
 
                 let pixel_color = pixel_color * self.pixel_sample_scale;
 
-                write_color(&pixel_color);
+                write_color(&mut file, &pixel_color);
             }
         }
 
