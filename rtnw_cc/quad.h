@@ -3,11 +3,16 @@
 
 #include <memory>
 #include "hittable.h"
+#include "vec3.h"
 
 class quad : public hittable {
    public:
     quad(const point3& Q, const vec3& u, const vec3& v, shared_ptr<material> mat)
         : Q(Q), u(u), v(v), mat(mat) {
+        auto n = cross(u, v);
+        normal = unit_vector(n);
+        D = dot(normal, Q);
+
         set_bounding_box();
     }
 
@@ -30,6 +35,8 @@ class quad : public hittable {
     vec3 u, v;
     shared_ptr<material> mat;
     aabb bbox;
+    vec3 normal;
+    double D;
 };
 
 #endif
