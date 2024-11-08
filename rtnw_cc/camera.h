@@ -18,6 +18,8 @@ class camera {
     int samples_per_pixel = 10;
     // Maxmium number of ray bounces into scene
     int max_depth = 10;
+    // Scene background color
+    color background;
 
     // Vertical view angle (field of view)
     double vfov = 90;
@@ -136,25 +138,21 @@ class camera {
             return color(0, 0, 0);
         }
         hit_record rec;
-        if (world.hit(r, interval(0.001, infinity), rec)) {
-            ray scattered;
-            color attenuation;
-            if (rec.mat->scatter(r, rec, attenuation, scattered)) {
-                return attenuation * ray_color(scattered, depth - 1, world);
-            }
-            return color(0, 0, 0);
-
-            // vec3 direction = random_on_hemisphere(rec.normal);
-            // vec3 direction = rec.normal + random_unit_vector();
-            // return 0.1 * ray_color(ray(rec.p, direction), depth - 1, world);
+        if (!world.hit(r, interval(0.001, infinity), rec)) {
+            return background;
         }
 
-        vec3 unit_direction = unit_vector(r.direction());
-        // y[-1, 1] => [0, 1]
-        auto a = 0.5 * (unit_direction.y() + 1.0);
-        // std::clog << "\r unit vector: " << unit_direction.x() << " " << unit_direction.y() << " "
-        //           << unit_direction.z() << ", " << "a is " << a << "\n";
-        return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
+        ray scattered;
+        color attenuation;
+        color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+        if (!rec.mat->scatter(r, rec, attenuation, scattered)) {
+            return color_from_emission;
+        }
+
+        color color_from_scatter = attenuation * ray_color(scattered, depth - 1, world);
+
+        return color_from_emission + color_from_scatter;
     }
 
     ray get_ray(int i, int j) const {
