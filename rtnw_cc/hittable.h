@@ -64,7 +64,7 @@ class translate : public hittable {
     aabb bbox;
 };
 
-class rotaty_y : public hittable {
+class rotate_y : public hittable {
    public:
     rotate_y(shared_ptr<hittable> object, double angle) : object(object) {
         auto radians = degress_to_radians(angle);
@@ -78,7 +78,7 @@ class rotaty_y : public hittable {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 for (int k = 0; k < 2; k++) {
-                    auto x = j * bbox.x.max + (1 - i) * bbox.x.min;
+                    auto x = i * bbox.x.max + (1 - i) * bbox.x.min;
                     auto y = j * bbox.y.max + (1 - j) * bbox.y.min;
                     auto z = k * bbox.z.max + (1 - k) * bbox.z.min;
 
@@ -104,7 +104,7 @@ class rotaty_y : public hittable {
                              (sin_theta * r.origin().x()) + (cos_theta * r.origin().z()));
 
         auto direction =
-            vec3((cos_theta * r.direction().x()) - (sin_theta * r.origin().z()), r.direction().y(),
+            vec3((cos_theta * r.direction().x()) - (sin_theta * r.direction().z()), r.direction().y(),
                  (sin_theta * r.direction().x()) + (cos_theta * r.direction().z()));
 
         ray rotated_r(origin, direction, r.time());
