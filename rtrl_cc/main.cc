@@ -1,4 +1,5 @@
 #include <chrono>
+#include <iomanip>
 #include "bvh.h"
 #include "camera.h"
 #include "constant_medium.h"
@@ -368,6 +369,23 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     cam.render(world);
 }
 
+void estimating_pi() {
+    std::cout << std::fixed << std::setprecision(12);
+
+    int inside_circle = 0;
+    int N = 100000;
+
+    for (int i = 0; i < N; i++) {
+        auto x = random_double(-1, 1);
+        auto y = random_double(-1, 1);
+        if (x * x + y * y < 1) {
+            inside_circle++;
+        }
+    }
+
+    std::cout << "Estimate of Pi = " << (4.0 * inside_circle) / N << "\n";
+}
+
 typedef enum {
     BOUNCING_SPHERES = 0,
     CHECKERED_SPHERES,
@@ -378,12 +396,13 @@ typedef enum {
     CORNELL_BOX,
     CORNELL_SMOKE,
     FINAL_SCENE,
+    ESTIMATING_PI,
 } SCENE;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = FINAL_SCENE;
+    SCENE scene = ESTIMATING_PI;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
@@ -411,6 +430,10 @@ int main() {
             break;
         case FINAL_SCENE:
             final_scene(800, 250, 50);
+            break;
+        case ESTIMATING_PI:
+            estimating_pi();
+            break;
         default:
             break;
     }
