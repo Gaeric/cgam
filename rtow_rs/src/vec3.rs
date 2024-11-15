@@ -101,8 +101,7 @@ impl Vec3 {
 
     pub fn neal_zero(&self) -> bool {
         let s = 1e-8;
-        // use for replace fabs function
-        self.length() < s
+        self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
     }
 }
 
