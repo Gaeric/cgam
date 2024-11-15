@@ -1,4 +1,9 @@
-use crate::{color::Color, hittable::HitRecord, ray::Ray};
+use crate::{
+    color::Color,
+    hittable::HitRecord,
+    ray::{self, Ray},
+    vec3::Vec3,
+};
 
 pub trait Material {
     fn scatter(
@@ -22,6 +27,13 @@ impl Material for Lambertian {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        false
+        let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
+        if scatter_direction.neal_zero() {
+            scatter_direction = rec.normal;
+        }
+
+        *scattered = Ray::new(rec.p, scatter_direction);
+        *attenuation = self.albedo;
+        return true;
     }
 }

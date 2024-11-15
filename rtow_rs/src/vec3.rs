@@ -88,6 +88,22 @@ impl Vec3 {
             self.z / self.length(),
         )
     }
+
+    pub fn random_unit_vector() -> Vec3 {
+        loop {
+            let p = Vec3::random_random();
+            let lensq = p.length_squared();
+            if 1e-160 < lensq && lensq <= 1.0 {
+                return p.unit();
+            }
+        }
+    }
+
+    pub fn neal_zero(&self) -> bool {
+        let s = 1e-8;
+        // use for replace fabs function
+        self.length() < s
+    }
 }
 
 impl Neg for Vec3 {

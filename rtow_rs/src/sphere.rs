@@ -25,11 +25,9 @@ impl<'a> Sphere<'a> {
 impl<'b> Hittable for Sphere<'b> {
     fn hit<'a>(&'a self, r: &Ray, ray_t: Interval, rec: &mut HitRecord<'a>) -> bool {
         let oc = self.center - *r.origin();
-
         let a = r.direction().length_squared();
         let h = oc.dot(r.direction());
         let c = oc.length_squared() - self.radius * self.radius;
-
         let discriminant = h * h - a * c;
 
         if discriminant < 0.0 {

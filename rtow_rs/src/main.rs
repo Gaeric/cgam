@@ -15,17 +15,15 @@ mod vec3;
 mod rtweekend;
 
 fn main() {
-    const DELAY_TIME: u64 = 0;
-
     let mut camera = Camera::new();
 
-    let center: Point3 = Point3::random_random();
+    let center: Point3 = Point3::new(0.0, 0.0, -1.0);
     let albedo: Color = Color::random_random() * Color::random_random();
     let lambertian_material = Lambertian { albedo };
-    let sphere = Sphere::new(center, 2.0, &lambertian_material);
+    let sphere = Sphere::new(center, 0.2, &lambertian_material);
 
-    camera.delay = DELAY_TIME;
-    camera.image_width = 400;
+    camera.samples_per_pixel = 10;
+    camera.image_width = 256;
 
     camera.render(sphere);
 }
