@@ -147,7 +147,7 @@ impl Camera {
             + ((i as f64 + offset.x()) * self.pixel_delta_u)
             + ((j as f64 + offset.y()) * self.pixel_delta_v);
 
-        eprintln!("offset {:#?}, pixel_sample {:#?}\n", offset, pixel_sample);
+        // eprintln!("offset {:#?}, pixel_sample {:#?}\n", offset, pixel_sample);
 
         let ray_origin = self.center;
         // if self.defocus_angle <= 0.0
@@ -157,26 +157,24 @@ impl Camera {
     }
 
     pub fn render<T: Hittable>(&mut self, world: T) {
-        const IMAGE_WIDTH: i32 = 256;
-        const IMAGE_HEIGHT: i32 = 256;
         let ms = time::Duration::from_millis(self.delay);
 
         self.initialize();
 
         let mut file = File::create("output.ppm").unwrap();
 
-        let _ = writeln!(file, "P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+        let _ = writeln!(file, "P3\n{} {}\n255", self.image_width, self.image_height);
 
-        for j in 0..IMAGE_HEIGHT {
-            eprint!("\rScanlines remaining: {}", IMAGE_HEIGHT - j);
+        for j in 0..self.image_width {
+            eprint!("\rScanlines remaining: {}", self.image_height - j);
             std::io::stderr().flush().unwrap();
             sleep(ms);
-            for i in 0..IMAGE_WIDTH {
+            for i in 0..self.image_width {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for sample in 0..self.samples_per_pixel {
-                    let mut r = self.get_ray(i, j);
+                    let mut r = self.get_ray(i as i32, j as i32);
                     let sample_color = Self::ray_color(&mut r, self.max_depth, &world);
-                    eprintln!("ray {:#?}, sample color: {:#?}", r, sample_color);
+                    // eprintln!("ray {:#?}, sample color: {:#?}", r, sample_color);
 
                     pixel_color += sample_color;
                 }

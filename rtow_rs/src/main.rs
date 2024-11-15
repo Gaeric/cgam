@@ -25,6 +25,7 @@ fn main() {
     let sphere = Sphere::new(center, 2.0, &lambertian_material);
 
     camera.delay = DELAY_TIME;
+    camera.image_width = 400;
 
     camera.render(sphere);
 }
