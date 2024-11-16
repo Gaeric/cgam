@@ -103,9 +103,29 @@ impl Vec3 {
         let s = 1e-8;
         self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
     }
+
+    // to be verify
+    pub fn reflect(&self, n: &Vec3) -> Vec3 {
+        (*self - (2.0 * (self.dot(n))) * n).clone()
+    }
+
+    // to be verify
+    pub fn refrace(&self, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = -(*self).dot(n).min(1.0);
+        let r_out_perp: Vec3 = etai_over_etat * (*self + cos_theta * n);
+        let r_out_parallel: Vec3 = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
+        return r_out_perp + r_out_parallel;
+    }
 }
 
 impl Neg for Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Vec3 {
+        Vec3::new(-self.x, -self.y, -self.z)
+    }
+}
+
+impl Neg for &Vec3 {
     type Output = Vec3;
     fn neg(self) -> Vec3 {
         Vec3::new(-self.x, -self.y, -self.z)
@@ -163,9 +183,24 @@ impl Mul<Vec3> for f64 {
     }
 }
 
+impl Mul<&Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, v: &Vec3) -> Vec3 {
+        Vec3::new(self * v.x, self * v.y, self * v.z)
+    }
+}
+
 impl Mul<Vec3> for Vec3 {
     type Output = Vec3;
     fn mul(self, v: Vec3) -> Vec3 {
+        Vec3::new(self.x * v.x, self.y * v.y, self.z * v.z)
+    }
+}
+
+impl Mul<&Vec3> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, v: &Vec3) -> Vec3 {
         Vec3::new(self.x * v.x, self.y * v.y, self.z * v.z)
     }
 }
