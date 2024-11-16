@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use camera::Camera;
 use color::Color;
 use material::{Dielectric, Lambertian};
@@ -30,5 +32,11 @@ fn main() {
     camera.max_depth = 20;
     camera.image_width = 256;
 
+    let start = Instant::now();
+
     camera.render(sphere);
+
+    let duration = start.elapsed();
+
+    println!("escape time: {} ms", duration.as_millis());
 }
