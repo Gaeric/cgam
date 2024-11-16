@@ -396,7 +396,23 @@ void estimating_pi() {
         }
     }
     std::cout << "Regular    Estimate of Pi = " << (4.0 * inside_circle) / (sqrt_N * sqrt_N) << "\n";
-    std::cout << "Stratified Estimate of Pi = " << (4.0 * inside_circle_stratified) / (sqrt_N * sqrt_N) << "\n";
+    std::cout << "Stratified Estimate of Pi = " << (4.0 * inside_circle_stratified) / (sqrt_N * sqrt_N)
+              << "\n";
+}
+
+void integrate_x_sq() {
+    int a = 0;
+    int b = 2;
+    int N = 1000000;
+    auto sum = 0.0;
+
+    for (int i = 0; i < N; i++) {
+        auto x = random_double(a, b);
+        sum += x * x;
+    }
+
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "I = " << (b - a) * (sum / N) << "\n";
 }
 
 typedef enum {
@@ -410,12 +426,13 @@ typedef enum {
     CORNELL_SMOKE,
     FINAL_SCENE,
     ESTIMATING_PI,
+    INTEGRATE_X_SQ,
 } SCENE;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = CORNELL_BOX;
+    SCENE scene = INTEGRATE_X_SQ;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
@@ -446,6 +463,9 @@ int main() {
             break;
         case ESTIMATING_PI:
             estimating_pi();
+            break;
+        case INTEGRATE_X_SQ:
+            integrate_x_sq();
             break;
         default:
             break;
