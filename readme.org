@@ -92,3 +92,12 @@
     通过交换构造前面时u/v向量的顺序，以及改变顶面时选择不同的点位，观察到生成的box并没有变化，可以确认构造6个矩面没有确切的顶点顺序要求
 *** rotation
     旋转以世界坐标的原点为中心进行转动，而并非以模型为中心旋转
+** TODO to do
+*** rtow_rs
+*** rtow_wgpu
+*** wgpu_rtr
+**** rt_shadow
+**** rt_gi
+**** rt_environment light
+**** rt_pbr
+**** rt_rt
