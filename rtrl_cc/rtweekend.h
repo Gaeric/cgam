@@ -31,6 +31,16 @@ inline double random_double() {
     return distribution(generator);
 }
 
+// d is a random number in [0, 1);
+// uniform number in [0, sqrt(2)) or [sqrt(2), 2)
+double f(double d) {
+    if (d <= 0.5) {
+        return std::sqrt(2.0) * random_double();
+    } else {
+        return std::sqrt(2.0) + (2 - std::sqrt(2.0)) * random_double();
+    }
+}
+
 inline double random_double(double min, double max) {
     // return random real in [min, max)
     return min + (max - min) * random_double();
