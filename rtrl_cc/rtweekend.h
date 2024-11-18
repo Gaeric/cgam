@@ -33,7 +33,7 @@ inline double random_double() {
 
 // d is a random number in [0, 1);
 // uniform number in [0, sqrt(2)) or [sqrt(2), 2)
-double f(double d) {
+inline double f(double d) {
     if (d <= 0.5) {
         return std::sqrt(2.0) * random_double();
     } else {
