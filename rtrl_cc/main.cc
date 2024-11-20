@@ -401,19 +401,24 @@ void estimating_pi() {
 }
 
 double icd(double d) {
-    return 2.0 * d;
+    return 8.0 * std::pow(d, 1.0 / 3.0);
 }
 
 double pdf(double x) {
-    return 0.5;
+    return (3.0 / 8.0) * x * x;
 }
 
 void integrate_x_sq() {
-    int N = 1000000;
+    int N = 1;
     auto sum = 0.0;
 
     for (int i = 0; i < N; i++) {
-        auto x = icd(random_double());
+        auto z = random_double();
+        // Ignore zero to avoid NaNs
+        if (z == 0.0) {
+            continue;
+        }
+        auto x = icd(z);
         sum += x * x / pdf(x);
     }
 
