@@ -1,5 +1,6 @@
 #include <chrono>
 #include <iomanip>
+#include <ios>
 #include "bvh.h"
 #include "camera.h"
 #include "constant_medium.h"
@@ -475,6 +476,28 @@ void estimate_halfway() {
     std::cout << "Halfwar = " << halfway_point << '\n';
 }
 
+double f(const vec3& d) {
+    auto cosine_squared = d.z() * d.z();
+    return cosine_squared;
+}
+
+double pdf(const vec3& d) {
+    return 1 / (4 * pi);
+}
+
+void sphere_importance() {
+    int N = 1000000;
+    auto sum = 0.0;
+    for (int i = 0; i < N; i++) {
+        vec3 d = random_unit_vector();
+        auto f_d = f(d);
+        sum += f_d / pdf(d);
+    }
+
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "I = " << sum / N << '\n';
+}
+
 typedef enum {
     BOUNCING_SPHERES = 0,
     CHECKERED_SPHERES,
@@ -488,12 +511,13 @@ typedef enum {
     ESTIMATING_PI,
     INTEGRATE_X_SQ,
     ESTIMATE_HALFWAY,
+    SPHERE_IMPORTANCE,
 } SCENE;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = INTEGRATE_X_SQ;
+    SCENE scene = SPHERE_IMPORTANCE;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
@@ -530,6 +554,10 @@ int main() {
             break;
         case ESTIMATE_HALFWAY:
             estimate_halfway();
+            break;
+        case SPHERE_IMPORTANCE:
+            sphere_importance();
+            break;
         default:
             break;
     }
