@@ -16,7 +16,9 @@ class material {
         return false;
     }
 
-    virtual double scattering_pdf(const ray& r_in, const hit_record, const ray& scattered) const { return 0; }
+    virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+        return 0;
+    }
 };
 
 class lambertian : public material {
