@@ -239,7 +239,7 @@ void cornell_box() {
 
     cam.aspect_ratio = 1.0;
     cam.image_width = 600;
-    cam.samples_per_pixel = 64;
+    cam.samples_per_pixel = 1000;
     cam.max_depth = 50;
     cam.background = color(0, 0, 0);
 
@@ -517,7 +517,7 @@ typedef enum {
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = SPHERE_IMPORTANCE;
+    SCENE scene = CORNELL_BOX;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
