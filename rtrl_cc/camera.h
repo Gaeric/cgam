@@ -158,7 +158,11 @@ class camera {
             return color_from_emission;
         }
 
-        color color_from_scatter = attenuation * ray_color(scattered, depth - 1, world);
+        double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);
+        double pdf_value = scattering_pdf;
+
+        color color_from_scatter =
+            (attenuation * scattering_pdf * ray_color(scattered, depth - 1, world)) / pdf_value;
 
         return color_from_emission + color_from_scatter;
     }
@@ -184,7 +188,6 @@ class camera {
         auto py = ((s_j + random_double()) * recip_sqrt_spp) - 0.5;
         return vec3(px, py, 0);
     }
-
 
     vec3 sample_square() const {
         // Returns the vector to a random point in the [-0.5, -0.5]-[+0.5, +0.5] unit square.
