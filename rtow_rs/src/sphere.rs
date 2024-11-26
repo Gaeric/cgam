@@ -6,6 +6,7 @@ use crate::{
     vec3::Point3,
 };
 
+#[derive(Debug)]
 pub struct Sphere<'a> {
     center: Point3,
     radius: f64,

@@ -1,12 +1,8 @@
-use crate::{
-    color::Color,
-    hittable::HitRecord,
-    ray::{self, Ray},
-    rtweekend::random_double,
-    vec3::Vec3,
-};
+use std::fmt::Debug;
 
-pub trait Material {
+use crate::{color::Color, hittable::HitRecord, ray::Ray, rtweekend::random_double, vec3::Vec3};
+
+pub trait Material: Debug {
     fn scatter(
         &self,
         r_in: &Ray,
@@ -16,6 +12,7 @@ pub trait Material {
     ) -> bool;
 }
 
+#[derive(Debug)]
 pub struct Lambertian {
     pub albedo: Color,
 }
@@ -39,6 +36,7 @@ impl Material for Lambertian {
     }
 }
 
+#[derive(Debug)]
 pub struct Dielectric {
     pub refraction_index: f64,
 }
