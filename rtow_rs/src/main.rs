@@ -28,8 +28,6 @@ fn main() {
         refraction_index: 1.5,
     };
 
-    let sphere = Sphere::new(center, 0.5, &dielectric_material);
-
     camera.samples_per_pixel = 50;
     camera.max_depth = 20;
     camera.image_width = 256;
@@ -37,7 +35,8 @@ fn main() {
     let start = Instant::now();
 
     let mut world: Vec<Box<dyn Hittable>> = Vec::new();
-    world.push(Box::new(sphere));
+    world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, &lambertian_material)));
+    world.push(Box::new(Sphere::new(center, 0.5, &dielectric_material)));
 
     camera.render(&world);
 
