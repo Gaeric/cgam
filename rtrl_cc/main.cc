@@ -197,8 +197,8 @@ void simple_light() {
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 400;
-    cam.samples_per_pixel = 100;
-    cam.max_depth = 50;
+    cam.samples_per_pixel = 64;
+    cam.max_depth = 16;
     cam.background = color(0, 0, 0);
 
     cam.vfov = 20;
