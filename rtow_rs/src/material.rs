@@ -83,3 +83,25 @@ impl Material for Dielectric {
         return true;
     }
 }
+
+#[derive(Debug)]
+pub struct Metal {
+    pub albedo: Color,
+    pub fuzz: f64,
+}
+
+impl Material for Metal {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &mut HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        let mut reflected: Vec3 = r_in.direction().reflect(&rec.normal);
+        reflected = reflected.unit() + (self.fuzz * Vec3::random_unit_vector());
+        *scattered = Ray::new(rec.p, reflected);
+        *attenuation = self.albedo;
+        scattered.direction().dot(&rec.normal) > 0.0
+    }
+}
