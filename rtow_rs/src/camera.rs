@@ -1,5 +1,6 @@
 use crate::color::{write_color, Color};
 use crate::hittable::{HitRecord, Hittable};
+use crate::hittable_list::HittableCollection;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::rtweekend::degress_to_radians;
@@ -114,7 +115,7 @@ impl Camera {
         self.defocus_disk_v = self.v * defocus_radius;
     }
 
-    fn ray_color<T: Hittable>(r: &mut Ray, depth: i32, world: &T) -> Color {
+    fn ray_color<'a, T: HittableCollection<'a>>(r: &mut Ray, depth: i32, world: &'a T) -> Color {
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }
@@ -156,7 +157,7 @@ impl Camera {
         Ray::new(ray_origin, ray_direction)
     }
 
-    pub fn render<T: Hittable>(&mut self, world: T) {
+    pub fn render<'a, T: HittableCollection<'a>>(&mut self, world: &'a T) {
         let ms = time::Duration::from_millis(self.delay);
 
         self.initialize();
@@ -173,7 +174,7 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for sample in 0..self.samples_per_pixel {
                     let mut r = self.get_ray(i as i32, j as i32);
-                    let sample_color = Self::ray_color(&mut r, self.max_depth, &world);
+                    let sample_color = Self::ray_color(&mut r, self.max_depth, world);
                     // eprintln!("ray {:#?}, sample color: {:#?}", r, sample_color);
 
                     pixel_color += sample_color;

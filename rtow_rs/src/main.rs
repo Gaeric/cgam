@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use camera::Camera;
 use color::Color;
+use hittable::Hittable;
 use material::{Dielectric, Lambertian};
 use sphere::Sphere;
 use vec3::Point3;
@@ -15,6 +16,7 @@ mod ray;
 mod rtweekend;
 mod sphere;
 mod vec3;
+mod hittable_list;
 
 fn main() {
     let mut camera = Camera::new();
@@ -34,7 +36,10 @@ fn main() {
 
     let start = Instant::now();
 
-    camera.render(sphere);
+    let mut world: Vec<Box<dyn Hittable>> = Vec::new();
+    world.push(Box::new(sphere));
+
+    camera.render(&world);
 
     let duration = start.elapsed();
 
