@@ -498,6 +498,18 @@ void sphere_importance() {
     std::cout << "I = " << sum / N << '\n';
 }
 
+void sphere_plot() {
+    for (int i = 0; i < 200; i++) {
+        auto r1 = random_double();
+        auto r2 = random_double();
+        auto x = std::cos(2 * pi * r1) * 2 * std::sqrt(r2 * (1 - r2));
+        auto y = std::sin(2 * pi * r1) * 2 * std::sqrt(r2 * (1 - r2));
+        auto z = 1 - 2 * r2;
+
+        std::cout << x << " " << y << " " << z << "\n";
+    }
+}
+
 typedef enum {
     BOUNCING_SPHERES = 0,
     CHECKERED_SPHERES,
@@ -512,12 +524,13 @@ typedef enum {
     INTEGRATE_X_SQ,
     ESTIMATE_HALFWAY,
     SPHERE_IMPORTANCE,
+    SPHERE_PLOT,
 } SCENE;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = CORNELL_BOX;
+    SCENE scene = SPHERE_PLOT;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
@@ -557,6 +570,9 @@ int main() {
             break;
         case SPHERE_IMPORTANCE:
             sphere_importance();
+            break;
+        case SPHERE_PLOT:
+            sphere_plot();
             break;
         default:
             break;
