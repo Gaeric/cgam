@@ -19,7 +19,7 @@
 *** rtow_rs
     注意使用rust重写时，不要照着原始的cpp代码直接抄写，尽量理解该函数背后的数学内容，然后对照着数学用rust实现
 ** rtnw
-   book: https://raytracing.github.io/books/RayTracingTheNextWeek.html#overview
+   book: https://raytracing.github.io/books/RayTracingTheNextWeek.html
 *** bvh
     采用3.10节bvh划分方法后，渲染时长比3.9节完成的bvh划分后渲染时长更长，这里需要分析问题的原因，并找到bvh划分的良好方法。
 
@@ -95,11 +95,33 @@
 *** rotation
     旋转以世界坐标的原点为中心进行转动，而并非以模型为中心旋转
 ** rtrl
+   book: https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html
 *** pdf
     1. 为什么通过IDC函数能将均匀采样转换为符合PDF的非均匀采样
     2. 通过IDC转换采样分布后，为什么需要重新除以pdf以修正采样权重，为什么权重是 1 / pdf
     3. 重要性采样的数学过程和推导以及关联性质
     4. 球面逆采样的更详细的数学原理是什么
+*** Inverse transform sampling
+    原文：
+    Let’s first figure out how to generate random directions. We already have a method to generate random directions using the rejection method, so let's create one using the inversion method. To simplify things, assume the z axis is the surface normal, and θ is the angle from the normal. We'll set everything up in terms of the z axis this chapter. Next chapter we’ll get them oriented to the surface normal vector. We will only deal with distributions that are rotationally symmetric about z. So p(ω)=f(θ)
+
+    这段话给出了如下信息：
+    1. 坐标和方向
+       假设z轴是表面法线，\(\theta \)是从法线开始测量的角度，即\(\theta\)是从z轴测量的极角，\(\phi\)是xy平面的方位角
+    2. z轴旋转对称性
+       由于在讨论关于z轴旋转对称的分布函数，这意味着方向角\(\phi\)在0到 \(2\pi\) 之间均匀分布
+
+    猜测其概率密度函数的生成为：
+
+    在球面上的概率密度函数表示为\(p(\omega) = f(\theta)\)，是仅与\(\theta\)相关的函数
+    在球面坐标系中，球面上的一个微小面积元素可以表示为 \(dA = \sin(\theta) \, d\theta \, d\phi\)
+    球面元素落在任意一个点，对应的\(\theta\)角度上的可能为：
+    \[ b(\theta) = \int_{0}^{2\pi} f(\theta)\sin(\theta) \, d\phi \]
+
+    即为
+    \[ b(\theta) = 2\pi f(\theta)\sin(\theta) \]
+
+**** 注： 这里尚未解释dA与概率 \(p(\omega)\) 之间的联系，仍然需要进一步确认
 * TODO todolist 
 *** rtow_wgpu
 *** wgpu_rtr
