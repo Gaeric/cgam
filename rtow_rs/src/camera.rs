@@ -139,6 +139,7 @@ impl Camera {
     }
 
     pub fn sample_square() -> Vec3 {
+        // Returns the vector to a random point in the [-0.5, -0.5]-[+0.5, +0.5] unit square.
         Vec3::random_random() - Vec3::new(0.5, 0.5, 0.0)
     }
 
@@ -149,8 +150,13 @@ impl Camera {
             + ((j as f64 + offset.y()) * self.pixel_delta_v);
 
         // eprintln!("offset {:#?}, pixel_sample {:#?}\n", offset, pixel_sample);
+        let ray_origin: Vec3;
+        if self.defocus_angle <= 0.0 {
+            ray_origin = self.center;
+        } else {
+            ray_origin = self.defocus_disk_sample();
+        }
 
-        let ray_origin = self.center;
         // if self.defocus_angle <= 0.0
         let ray_direction = pixel_sample - ray_origin;
 
@@ -187,5 +193,11 @@ impl Camera {
         }
 
         eprintln!("\rDone.        ");
+    }
+
+    fn defocus_disk_sample(&self) -> Point3 {
+        // Returns a random point in the camera defocus disk.
+        let p = Vec3::random_in_unit_disk();
+        return self.center + (p.x() * self.defocus_disk_u) + (p.y() * self.defocus_disk_v);
     }
 }

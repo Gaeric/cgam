@@ -2,6 +2,8 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
 use rand::Rng;
 
+use crate::rtweekend::{random_double, random_double_range};
+
 // some code reference glam
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Vec3 {
@@ -95,6 +97,19 @@ impl Vec3 {
             let lensq = p.length_squared();
             if 1e-160 < lensq && lensq <= 1.0 {
                 return p.unit();
+            }
+        }
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let p = Vec3::new(
+                random_double_range(-1.0, 1.0),
+                random_double_range(-1.0, 1.0),
+                0.0,
+            );
+            if p.length_squared() < 1.0 {
+                return p;
             }
         }
     }
