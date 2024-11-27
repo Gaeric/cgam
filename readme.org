@@ -16,6 +16,8 @@
    这正是用rust重写一遍，review并记录笔记的好时机！
 
    但是，我需要降低这一事件的优先级，因为我需要首先完整的读完这个系列的三本书藉。我希望能整对整个RT过程有一个清晰直观的解决方案后，再来逐步解决过程中的困惑。
+*** rtow_rs
+    注意使用rust重写时，不要照着原始的cpp代码直接抄写，尽量理解该函数背后的数学内容，然后对照着数学用rust实现
 ** rtnw
    book: https://raytracing.github.io/books/RayTracingTheNextWeek.html#overview
 *** bvh
@@ -97,7 +99,8 @@
     1. 为什么通过IDC函数能将均匀采样转换为符合PDF的非均匀采样
     2. 通过IDC转换采样分布后，为什么需要重新除以pdf以修正采样权重，为什么权重是 1 / pdf
     3. 重要性采样的数学过程和推导以及关联性质
-*** rtow_rs
+    4. 球面逆采样的更详细的数学原理是什么
+* TODO todolist 
 *** rtow_wgpu
 *** wgpu_rtr
 **** rt_shadow
@@ -105,3 +108,5 @@
 **** rt_environment light
 **** rt_pbr
 **** rt_rt
+*** games001
+
