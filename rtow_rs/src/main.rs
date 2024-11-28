@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{sync::Arc, time::Instant};
 
 use camera::Camera;
 use color::Color;
@@ -10,23 +10,24 @@ use vec3::Point3;
 mod camera;
 mod color;
 mod hittable;
+mod hittable_list;
 mod interval;
 mod material;
 mod ray;
 mod rtweekend;
 mod sphere;
 mod vec3;
-mod hittable_list;
 
 fn main() {
     let mut camera = Camera::new();
+    let mut world: Vec<Box<dyn Hittable>> = Vec::new();
 
     let center: Point3 = Point3::new(0.0, 0.0, -1.0);
     let albedo: Color = Color::random_random() * Color::random_random();
-    let lambertian_material = Lambertian { albedo };
-    let dielectric_material = Dielectric {
+    let lambertian_material = Arc::new(Lambertian { albedo });
+    let dielectric_material = Arc::new(Dielectric {
         refraction_index: 1.5,
-    };
+    });
 
     camera.samples_per_pixel = 50;
     camera.max_depth = 20;
@@ -34,9 +35,12 @@ fn main() {
 
     let start = Instant::now();
 
-    let mut world: Vec<Box<dyn Hittable>> = Vec::new();
-    world.push(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, &lambertian_material)));
-    world.push(Box::new(Sphere::new(center, 0.5, &dielectric_material)));
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        lambertian_material,
+    )));
+    world.push(Box::new(Sphere::new(center, 0.5, dielectric_material)));
 
     camera.render(&world);
 

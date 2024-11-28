@@ -4,12 +4,12 @@ use crate::{
     ray::Ray,
 };
 
-pub trait HittableCollection<'a> {
-    fn hit(&'a self, r: &Ray, ray_t: Interval, rec: &mut HitRecord<'a>) -> bool;
+pub trait HittableCollection {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
 }
 
-impl<'a> HittableCollection<'a> for Vec<Box<dyn Hittable + 'a>> {
-    fn hit(&'a self, r: &Ray, ray_t: Interval, rec: &mut HitRecord<'a>) -> bool {
+impl HittableCollection for Vec<Box<dyn Hittable>> {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let mut hit_anything: bool = false;
         let mut closest_so_far = ray_t.max;
         let mut temp_rec: HitRecord = Default::default();
