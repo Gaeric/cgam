@@ -510,6 +510,29 @@ void sphere_plot() {
     }
 }
 
+double cos_cubed_f(double r2) {
+    auto z = 1 - r2;
+    double cos_theta = z;
+    return cos_theta * cos_theta * cos_theta;
+}
+
+double cos_cubed_pdf() {
+    return 1.0 / (2.0 * pi);
+}
+
+void cos_cubed() {
+    int N = 1000000;
+    auto sum = 0.0;
+    for (int i = 0; i < N; i++) {
+        auto r2 = random_double();
+        sum += cos_cubed_f(r2) / cos_cubed_pdf();
+    }
+
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "PI/2 = " << pi / 2.0 << "\n";
+    std::cout << "Estimate = " << sum / N << "\n";
+}
+
 typedef enum {
     BOUNCING_SPHERES = 0,
     CHECKERED_SPHERES,
@@ -525,12 +548,13 @@ typedef enum {
     ESTIMATE_HALFWAY,
     SPHERE_IMPORTANCE,
     SPHERE_PLOT,
+    COS_CUBED,
 } SCENE;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = SPHERE_PLOT;
+    SCENE scene = COS_CUBED;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
@@ -573,6 +597,9 @@ int main() {
             break;
         case SPHERE_PLOT:
             sphere_plot();
+            break;
+        case COS_CUBED:
+            cos_cubed();
             break;
         default:
             break;
