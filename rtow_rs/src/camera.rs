@@ -8,7 +8,8 @@ use crate::vec3::{Point3, Vec3};
 
 use core::time;
 use std::fs::File;
-use std::sync::Arc;
+use std::rc::Rc;
+
 use std::{io::Write, thread::sleep};
 
 pub struct Camera {
@@ -128,8 +129,10 @@ impl Camera {
             let mut scattered: Ray = Default::default();
             let mut attenuation: Color = Default::default();
             if let Some(ref mat) = rec.mat {
-                let mat_clone = Arc::clone(mat);
-                if mat_clone.scatter(r, &mut rec, &mut attenuation, &mut scattered) {
+                if mat
+                    .clone()
+                    .scatter(r, &mut rec, &mut attenuation, &mut scattered)
+                {
                     return attenuation * Self::ray_color(&mut scattered, depth - 1, world);
                 }
             }

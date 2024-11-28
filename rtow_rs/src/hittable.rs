@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::{
     interval::Interval,
@@ -11,7 +11,7 @@ use crate::{
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat: Option<Arc<dyn Material>>,
+    pub mat: Option<Rc<dyn Material>>,
     pub t: f64,
     pub front_face: bool,
 }

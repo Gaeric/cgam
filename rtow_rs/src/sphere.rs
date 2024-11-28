@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::{
     hittable::{HitRecord, Hittable},
@@ -12,11 +12,11 @@ use crate::{
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat: Arc<dyn Material>,
+    mat: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat: Rc<dyn Material>) -> Self {
         Self {
             center: center.clone(),
             radius,

@@ -1,4 +1,5 @@
-use std::{sync::Arc, time::Instant};
+use std::rc::Rc;
+use std::time::Instant;
 
 use camera::Camera;
 use color::Color;
@@ -24,8 +25,8 @@ fn main() {
 
     let center: Point3 = Point3::new(0.0, 0.0, -1.0);
     let albedo: Color = Color::random_random() * Color::random_random();
-    let lambertian_material = Arc::new(Lambertian { albedo });
-    let dielectric_material = Arc::new(Dielectric {
+    let lambertian_material = Rc::new(Lambertian { albedo });
+    let dielectric_material = Rc::new(Dielectric {
         refraction_index: 1.5,
     });
 
