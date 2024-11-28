@@ -533,6 +533,28 @@ void cos_cubed() {
     std::cout << "Estimate = " << sum / N << "\n";
 }
 
+double cos_density_f(const vec3& d) {
+    auto cos_theta = d.z();
+    return cos_theta * cos_theta * cos_theta;
+}
+
+double cos_density_pdf(const vec3& d) {
+    return d.z() / pi;
+}
+
+void cos_density() {
+    int N = 1000000;
+    auto sum = 0.0;
+    for (int i = 0; i < N; i++) {
+        vec3 d = random_cosine_direction();
+        sum += cos_density_f(d) / cos_density_pdf(d);;
+    }
+
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "PI/2 = " << pi / 2.0 << "\n";
+    std::cout << "Estimate = " << sum / N << "\n";
+}
+
 typedef enum {
     BOUNCING_SPHERES = 0,
     CHECKERED_SPHERES,
@@ -549,12 +571,13 @@ typedef enum {
     SPHERE_IMPORTANCE,
     SPHERE_PLOT,
     COS_CUBED,
+    COS_DENSITY,
 } SCENE;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = COS_CUBED;
+    SCENE scene = COS_DENSITY;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
@@ -600,6 +623,9 @@ int main() {
             break;
         case COS_CUBED:
             cos_cubed();
+            break;
+        case COS_DENSITY:
+            cos_density();
             break;
         default:
             break;
