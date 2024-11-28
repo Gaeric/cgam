@@ -75,7 +75,7 @@ impl Camera {
     }
 
     fn initialize(&mut self) {
-        let image_height = self.image_width / self.aspect_ratio as u32;
+        let image_height = (self.image_width as f64 / self.aspect_ratio) as u32;
         if image_height < 1 {
             self.image_height = 1;
         } else {
@@ -177,13 +177,13 @@ impl Camera {
 
         let _ = writeln!(file, "P3\n{} {}\n255", self.image_width, self.image_height);
 
-        for j in 0..self.image_width {
+        for j in 0..self.image_height {
             eprint!("\rScanlines remaining: {}", self.image_height - j);
             std::io::stderr().flush().unwrap();
             sleep(ms);
             for i in 0..self.image_width {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-                for sample in 0..self.samples_per_pixel {
+                for _ in 0..self.samples_per_pixel {
                     let mut r = self.get_ray(i as i32, j as i32);
                     let sample_color = Self::ray_color(&mut r, self.max_depth, world);
                     // eprintln!("ray {:#?}, sample color: {:#?}", r, sample_color);
