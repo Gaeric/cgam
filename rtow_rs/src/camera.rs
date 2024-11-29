@@ -1,16 +1,14 @@
 use crate::color::{write_color, Color};
-use crate::hittable::{HitRecord, Hittable};
+use crate::hittable::HitRecord;
 use crate::hittable_list::HittableCollection;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::rtweekend::degress_to_radians;
 use crate::vec3::{Point3, Vec3};
 
-use core::time;
 use std::fs::File;
-use std::rc::Rc;
 
-use std::{io::Write, thread::sleep};
+use std::io::Write;
 
 pub struct Camera {
     pub aspect_ratio: f64,
@@ -23,7 +21,6 @@ pub struct Camera {
     pub vup: Vec3,
     pub defocus_angle: f64,
     pub focus_dist: f64,
-    pub delay: u64,
 
     /// Render image height
     image_height: u32,
@@ -69,8 +66,6 @@ impl Camera {
             w: Vec3::new(0.0, 0.0, 0.0),
             defocus_disk_u: Vec3::new(0.0, 0.0, 0.0),
             defocus_disk_v: Vec3::new(0.0, 0.0, 0.0),
-
-            delay: 0,
         }
     }
 
@@ -135,6 +130,8 @@ impl Camera {
                 {
                     return attenuation * Self::ray_color(&mut scattered, depth - 1, world);
                 }
+
+                return Color::new(0.0, 0.0, 0.0);
             }
         }
 
@@ -169,8 +166,6 @@ impl Camera {
     }
 
     pub fn render<T: HittableCollection>(&mut self, world: &T) {
-        let ms = time::Duration::from_millis(self.delay);
-
         self.initialize();
 
         let mut file = File::create("output.ppm").unwrap();
@@ -180,7 +175,6 @@ impl Camera {
         for j in 0..self.image_height {
             eprint!("\rScanlines remaining: {}", self.image_height - j);
             std::io::stderr().flush().unwrap();
-            sleep(ms);
             for i in 0..self.image_width {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..self.samples_per_pixel {
