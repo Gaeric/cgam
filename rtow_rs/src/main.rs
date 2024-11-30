@@ -29,7 +29,7 @@ fn main() {
     });
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
-        100.0,
+        1000.0,
         ground_material,
     )));
 
