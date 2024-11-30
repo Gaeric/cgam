@@ -65,10 +65,13 @@ class dielectric : public material {
         bool cannot_refract = ri * sin_theta > 1.0;
         vec3 direction;
 
+
+        std::clog << "ri: " << ri << ", cos_theth: " << cos_theta << "\n";
+
         if (cannot_refract || reflectance(cos_theta, ri) > random_double()) {
             direction = reflect(unit_direction, rec.normal);
         } else {
-            direction = refrace(unit_direction, rec.normal, ri);
+            direction = refract(unit_direction, rec.normal, ri);
         }
 
         scattered = ray(rec.p, direction);

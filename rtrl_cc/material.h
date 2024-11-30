@@ -104,7 +104,7 @@ class dielectric : public material {
         if (cannot_refract || reflectance(cos_theta, ri) > random_double()) {
             direction = reflect(unit_direction, rec.normal);
         } else {
-            direction = refrace(unit_direction, rec.normal, ri);
+            direction = refract(unit_direction, rec.normal, ri);
         }
 
         scattered = ray(rec.p, direction, r_in.time());

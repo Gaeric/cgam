@@ -130,9 +130,8 @@ impl Camera {
                 {
                     return attenuation * Self::ray_color(&mut scattered, depth - 1, world);
                 }
-
-                return Color::new(0.0, 0.0, 0.0);
             }
+            return Color::new(0.0, 0.0, 0.0);
         }
 
         let unit_direction = r.direction().unit();

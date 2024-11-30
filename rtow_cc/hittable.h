@@ -19,6 +19,10 @@ class hit_record {
         // Sets the hit record normal vector.
         // NOTE: the parameter `outward_normal` is assumed to have unit length;
 
+        std::clog << "r.direction: " << r.direction().x() << " " << r.direction().y() << " "
+                  << r.direction().z() << " outward_normal: " << outward_normal.x() << " "
+                  << outward_normal.y() << " " << outward_normal.z() << "\n";
+
         front_face = dot(r.direction(), outward_normal) < 0;
         normal = front_face ? outward_normal : -outward_normal;
     }

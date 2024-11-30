@@ -26,6 +26,15 @@ impl HitRecord {
         } else {
             self.normal = -outward_normal.clone();
         }
+
+        println!(
+            "r.direction: {:0.5?}, outward_normal: {:0.5?}, dot: {:0.5} front_face: {}, normal: {:0.5?}",
+            r.direction(),
+            outward_normal,
+            r.direction().dot(outward_normal),
+            self.front_face,
+            self.normal,
+        );
     }
 }
 
