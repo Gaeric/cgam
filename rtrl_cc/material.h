@@ -143,10 +143,16 @@ class isotropic : public material {
     bool scatter(const ray& r_in,
                  const hit_record& rec,
                  color& attenuation,
-                 ray& scattered, double& pdf) const override {
+                 ray& scattered,
+                 double& pdf) const override {
         scattered = ray(rec.p, random_unit_vector(), r_in.time());
         attenuation = tex->value(rec.u, rec.v, rec.p);
+        pdf = 1 / (4 * pi);
         return true;
+    }
+
+    double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
+        return 1 / (4 * pi);
     }
 
    private:

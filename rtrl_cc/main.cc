@@ -577,7 +577,7 @@ typedef enum {
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    SCENE scene = COS_DENSITY;
+    SCENE scene = CORNELL_BOX;
     switch (scene) {
         case BOUNCING_SPHERES:
             bouncing_spheres();
