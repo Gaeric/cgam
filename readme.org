@@ -132,5 +132,5 @@
 **** rt_environment light
 **** rt_pbr
 **** rt_rt
-*** games001
+*** pbrt
 
