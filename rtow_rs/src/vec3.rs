@@ -5,7 +5,7 @@ use rand::Rng;
 use crate::rtweekend::{random_double, random_double_range};
 
 // some code reference glam
-#[derive(Clone, Copy, Default, Debug)]
+#[derive(Clone, Copy, Default, PartialEq, Debug)]
 pub struct Vec3 {
     x: f64,
     y: f64,

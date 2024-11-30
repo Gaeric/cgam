@@ -56,3 +56,79 @@ impl Hittable for Sphere {
         true
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Color;
+    use crate::Lambertian;
+    use crate::Vec3;
+
+    #[test]
+    fn test_sphere_hit() {
+        let center = Vec3::new(0.0, 0.0, -5.0);
+        let radius = 1.0;
+        let ground_material = Rc::new(Lambertian {
+            albedo: Color::new(0.5, 0.5, 0.5),
+        });
+        let sphere = Sphere {
+            center,
+            radius,
+            mat: ground_material,
+        };
+        let ray_origin = Vec3::new(0.0, 0.0, 0.0);
+        let ray_direction = Vec3::new(0.0, 0.0, -1.0);
+        let ray = Ray::new(ray_origin, ray_direction);
+        let ray_t = Interval::new(0.0, 100.0);
+
+        let mut hit_record = HitRecord {
+            t: 0.0,
+            p: Vec3::new(0.0, 0.0, 0.0),
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            front_face: false,
+            mat: None,
+        };
+
+        let hit = sphere.hit(&ray, ray_t, &mut hit_record);
+
+        assert!(hit, "The ray should hit the sphere.");
+        assert!(hit_record.t > 0.0, "Intersection t should be greater than 0.");
+        assert_eq!(hit_record.p, Vec3::new(0.0, 0.0, -4.0), "Intersection point should be at (0, 0, -4).");
+        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, 1.0), "Normal should be (0, 0, 1).");
+        assert!(hit_record.mat.is_some(), "Material should be set.");
+    }
+
+    #[test]
+    fn test_sphere_hitrecord() {
+        let center = Vec3::new(0.0, 0.0, -5.0);
+        let radius = 1.0;
+        let ground_material = Rc::new(Lambertian {
+            albedo: Color::new(0.5, 0.5, 0.5),
+        });
+        let sphere = Sphere {
+            center,
+            radius,
+            mat: ground_material,
+        };
+        let ray_origin = Vec3::new(0.0, 0.0, -5.5);
+        let ray_direction = Vec3::new(0.0, 0.0, 1.0);
+        let ray = Ray::new(ray_origin, ray_direction);
+        let ray_t = Interval::new(0.0, 100.0);
+
+        let mut hit_record = HitRecord {
+            t: 0.0,
+            p: Vec3::new(0.0, 0.0, 0.0),
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            front_face: false,
+            mat: None,
+        };
+
+        let hit = sphere.hit(&ray, ray_t, &mut hit_record);
+
+        assert!(hit, "The ray should hit the sphere.");
+        assert!(hit_record.t > 0.0, "Intersection t should be greater than 0.");
+        assert_eq!(hit_record.p, Vec3::new(0.0, 0.0, -4.0), "Intersection point should be at (0, 0, -4).");
+        assert_eq!(hit_record.normal, Vec3::new(0.0, 0.0, -1.0), "Normal should be (0, 0, -1.0).");
+        assert!(hit_record.mat.is_some(), "Material should be set.");
+    }
+}
