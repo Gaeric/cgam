@@ -74,7 +74,7 @@ void bouncing_spheres() {
     cam.defocus_angle = 0.6;
     cam.focus_dist = 10.0;
 
-    cam.render(world);
+    // cam.render(world);
 }
 
 void checkered_spheres() {
@@ -98,7 +98,7 @@ void checkered_spheres() {
 
     cam.defocus_angle = 0;
 
-    cam.render(world);
+    // cam.render(world);
 }
 
 void earth() {
@@ -121,7 +121,7 @@ void earth() {
 
     cam.defocus_angle = 0;
 
-    cam.render(hittable_list(globe));
+    // cam.render(hittable_list(globe));
 }
 
 void perlin_spheres() {
@@ -145,7 +145,7 @@ void perlin_spheres() {
 
     cam.defocus_angle = 0;
 
-    cam.render(world);
+    // cam.render(world);
 }
 
 void quads() {
@@ -179,7 +179,7 @@ void quads() {
     cam.vup = vec3(0, 1, 0);
 
     cam.defocus_angle = 0;
-    cam.render(world);
+    // cam.render(world);
 }
 
 void simple_light() {
@@ -207,7 +207,7 @@ void simple_light() {
     cam.vup = vec3(0, 1, 0);
 
     cam.defocus_angle = 0;
-    cam.render(world);
+    // cam.render(world);
 }
 
 void cornell_box() {
@@ -235,6 +235,10 @@ void cornell_box() {
     box2 = make_shared<translate>(box2, vec3(130, 0, 65));
     world.add(box2);
 
+    // Light Sources
+    auto empty_material = shared_ptr<material>();
+    quad lights(point3(343, 554, 332), vec3(-130, 0, 0), vec3(0, 0, -105), empty_material);
+
     camera cam;
 
     cam.aspect_ratio = 1.0;
@@ -250,7 +254,7 @@ void cornell_box() {
 
     cam.defocus_angle = 0;
 
-    cam.render(world);
+    cam.render(world, lights);
 }
 
 void cornell_smoke() {
@@ -296,7 +300,7 @@ void cornell_smoke() {
 
     cam.defocus_angle = 0;
 
-    cam.render(world);
+    // cam.render(world);
 }
 
 void final_scene(int image_width, int samples_per_pixel, int max_depth) {
@@ -367,7 +371,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     cam.vup = vec3(0, 1, 0);
 
     cam.defocus_angle = 0;
-    cam.render(world);
+    // cam.render(world);
 }
 
 void estimating_pi() {
