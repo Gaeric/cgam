@@ -1,6 +1,7 @@
 #include <chrono>
 #include <iomanip>
 #include <ios>
+#include <memory>
 #include "bvh.h"
 #include "camera.h"
 #include "constant_medium.h"
@@ -225,7 +226,9 @@ void cornell_box() {
     world.add(make_shared<quad>(point3(555, 555, 555), vec3(-555, 0, 0), vec3(0, 0, -555), white));
     world.add(make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
 
-    shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+    shared_ptr<material> aluminum = make_shared<metal>(color(0.8, 0.85, 0.88), 0.0);
+    shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), aluminum);
+
     box1 = make_shared<rotate_y>(box1, 15);
     box1 = make_shared<translate>(box1, vec3(265, 0, 295));
     world.add(box1);
@@ -551,7 +554,8 @@ void cos_density() {
     auto sum = 0.0;
     for (int i = 0; i < N; i++) {
         vec3 d = random_cosine_direction();
-        sum += cos_density_f(d) / cos_density_pdf(d);;
+        sum += cos_density_f(d) / cos_density_pdf(d);
+        ;
     }
 
     std::cout << std::fixed << std::setprecision(12);
