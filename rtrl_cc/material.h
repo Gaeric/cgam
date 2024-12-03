@@ -1,11 +1,20 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "pdf.h"
 #include "color.h"
 #include "hittable.h"
 #include "onb.h"
 #include "texture.h"
 #include "vec3.h"
+
+class scatter_record {
+   public:
+    color attenuation;
+    std::shared_ptr<pdf> pdf_ptr;
+    bool skip_pdf;
+    ray skip_pdf_ray;
+};
 
 class material {
    public:
@@ -25,6 +34,10 @@ class material {
 
     virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
         return 0;
+    }
+
+    virtual bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const {
+        return false;
     }
 };
 
