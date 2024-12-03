@@ -1,6 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include <memory>
 #include "pdf.h"
 #include "color.h"
 #include "hittable.h"
@@ -24,14 +25,6 @@ class material {
         return color(0, 0, 0);
     }
 
-    virtual bool scatter(const ray& r_in,
-                         const hit_record& rec,
-                         color& attenuation,
-                         ray& scattered,
-                         double& pdf) const {
-        return false;
-    }
-
     virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
         return 0;
     }
@@ -48,28 +41,16 @@ class lambertian : public material {
 
     bool scatter(const ray& r_in,
                  const hit_record& rec,
-                 color& attenuation,
-                 ray& scattered,
-                 double& pdf) const override {
-        // auto scatter_direction = rec.normal + random_unit_vector();
-        onb uvw(rec.normal);
-        auto scatter_direction = uvw.transform(random_cosine_direction());
-        // auto scatter_direction = random_on_hemisphere(rec.normal);
-        // Catch degenerate scatter direction
-        // if (scatter_direction.near_zero()) {
-        //     scatter_direction = rec.normal;
-        // }
-
-        scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
-        attenuation = tex->value(rec.u, rec.v, rec.p);
-        pdf = dot(uvw.w(), scattered.direction()) / pi;
+                 scatter_record& srec) const override {
+        srec.attenuation = tex->value(rec.u, rec.v, rec.p);
+        srec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
+        srec.skip_pdf = false;
         return true;
     }
 
     double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
-        // auto cos_theta = dot(rec.normal, unit_vector(scattered.direction()));
-        // return cos_theta < 0 ? 0 : cos_theta / pi;
-        return 1 / (2 * pi);
+        auto cos_theta = dot(rec.normal, unit_vector(scattered.direction()));
+        return cos_theta < 0 ? 0 : cos_theta / pi;
     }
 
    private:
