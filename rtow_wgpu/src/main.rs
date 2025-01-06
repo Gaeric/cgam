@@ -3,6 +3,8 @@ use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
+mod render;
+
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
 
@@ -16,7 +18,8 @@ async fn main() -> Result<()> {
         .with_title("GPU PT".to_string())
         .build(&event_loop)?;
 
-    let (_device, _queue, surface) = connect_to_gpu(&window).await?;
+    let (device, queue, surface) = connect_to_gpu(&window).await?;
+    let _renderer = render::PathTracer::new(device, queue);
 
     event_loop.run(|event, control_handle| {
         control_handle.set_control_flow(ControlFlow::Poll);
