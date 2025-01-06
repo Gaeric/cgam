@@ -126,6 +126,9 @@
 **** 注： 这里尚未解释dA与概率 \(p(\omega)\) 之间的联系，仍然需要进一步确认
 * TODO todolist 
 *** rtow_wgpu
+    reference: https://github.com/RayTracing/gpu-tracing/
+
+    book: https://raytracing.github.io/gpu-tracing/book/RayTracingGPUEdition.html
 *** wgpu_rtr
 **** rt_shadow
 **** rt_gi
