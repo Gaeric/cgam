@@ -4,3 +4,4 @@
 /rtnw_cc/build/
 /rtow_rs/*.ppm
 /rtrl_cc/build/
+/rtow_wgpu/target/
