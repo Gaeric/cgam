@@ -6,7 +6,8 @@ use winit::window::{Window, WindowBuilder};
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
 
-fn main() -> Result<()> {
+#[pollster::main]
+async fn main() -> Result<()> {
     let event_loop = EventLoop::new()?;
     let window_size = winit::dpi::PhysicalSize::new(WIDTH, HEIGHT);
     let window = WindowBuilder::new()
@@ -15,12 +16,21 @@ fn main() -> Result<()> {
         .with_title("GPU PT".to_string())
         .build(&event_loop)?;
 
+    let (_device, _queue, surface) = connect_to_gpu(&window).await?;
+
     event_loop.run(|event, control_handle| {
         control_handle.set_control_flow(ControlFlow::Poll);
         match event {
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::CloseRequested => control_handle.exit(),
                 WindowEvent::RedrawRequested => {
+                    // Wait for the next available frame buffer
+                    let frame: wgpu::SurfaceTexture = surface
+                        .get_current_texture()
+                        .expect("failed to get current texture");
+
+                    // todo: draw frame
+                    frame.present();
                     window.request_redraw();
                 }
                 _ => (),
