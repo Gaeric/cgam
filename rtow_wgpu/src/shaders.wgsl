@@ -1,8 +1,11 @@
-const POSITIONS: array<vec3<f32>, 3> =
-    array<vec3<f32>, 3>(
-    vec3<f32>(-0.5, -0.5, 0.0),
-    vec3<f32>(0.5, -0.5, 0.0),
-    vec3<f32>(0.0, 0.5, 0.0)
+const POSITIONS: array<vec3<f32>, 6> =
+    array<vec3<f32>, 6>(
+    vec3<f32>(-1.0,  1.0, 0.0),
+    vec3<f32>(-1.0, -1.0, 0.0),
+    vec3<f32>( 1.0,  1.0, 0.0),
+    vec3<f32>( 1.0,  1.0, 0.0),
+    vec3<f32>(-1.0, -1.0, 0.0),
+    vec3<f32>( 1.0, -1.0, 0.0),
 );
 
 struct VertexOutput {
