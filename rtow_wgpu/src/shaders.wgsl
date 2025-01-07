@@ -8,6 +8,9 @@ const POSITIONS: array<vec3<f32>, 6> =
     vec3<f32>( 1.0, -1.0, 0.0),
 );
 
+const WIDTH: u32 = 800u;
+const HEIGHT: u32 = 600u;
+
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
 };
@@ -20,7 +23,7 @@ fn display_vs(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
 }
 
 @fragment
-// fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
-fn display_fs() -> @location(0) vec4<f32> {
-    return vec4<f32>(1.0, 0.0, 0.0, 1.0);
+fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
+    let color = in.clip_position.xy / vec2<f32>(f32(WIDTH - 1u), f32(HEIGHT - 1u));
+    return vec4<f32>(color, 0.0, 1.0);
 }
