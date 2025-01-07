@@ -19,7 +19,7 @@ async fn main() -> Result<()> {
         .build(&event_loop)?;
 
     let (device, queue, surface) = connect_to_gpu(&window).await?;
-    let _renderer = render::PathTracer::new(device, queue);
+    let renderer = render::PathTracer::new(device, queue);
 
     event_loop.run(|event, control_handle| {
         control_handle.set_control_flow(ControlFlow::Poll);
@@ -32,7 +32,12 @@ async fn main() -> Result<()> {
                         .get_current_texture()
                         .expect("failed to get current texture");
 
-                    // todo: draw frame
+                    let render_target = frame
+                        .texture
+                        .create_view(&wgpu::TextureViewDescriptor::default());
+
+                    renderer.render_frame(&render_target);
+
                     frame.present();
                     window.request_redraw();
                 }
@@ -77,12 +82,7 @@ async fn connect_to_gpu(window: &Window) -> Result<(wgpu::Device, wgpu::Queue, w
     let format = caps
         .formats
         .into_iter()
-        .find(|it| {
-            matches!(
-                it,
-                wgpu::TextureFormat::Rgba8Unorm | wgpu::TextureFormat::Bgra8Unorm
-            )
-        })
+        .find(|it| matches!(it, wgpu::TextureFormat::Bgra8Unorm))
         .context("could not find preferred texture format (Rgba8Unorm or Bgra8Unorm)")?;
 
     let size = window.inner_size();

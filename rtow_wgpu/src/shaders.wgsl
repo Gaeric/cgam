@@ -1,17 +1,17 @@
-alias TriangleVertices = array<vec2f, 3>;
-var<private> vertices: TriangleVertices = TriangleVertices(
-                                                           vec2f(-0.5, -0.5),
-                                                           vec2f(0.5, -0.5),
-                                                           vec2f(0.0, -0.5),
-                                                           );
+struct VertexOutput {
+    @builtin(position) clip_position: vec4<f32>,
+};
 
 @vertex
-fn display_vs(@builtin(vertex_index) vid: u32) -> @builtin(position) vec4f {
-  return vec4f(vertices[vid], 0.0, 1.0);
+fn display_vs(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
+    var out: VertexOutput;
+    let x = f32(1 - i32(in_vertex_index)) * 0.5;
+    let y = f32(i32(in_vertex_index & 1u) * 2 - 1) * 0.5;
+    out.clip_position = vec4<f32>(x, y, 0.0, 1.0);
+    return out;
 }
 
-
 @fragment
-fn display_fs() -> @location(0) vec4f {
-  return vec4f(1.0, 0.0, 0.0, 1.0);
+fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
+    return vec4<f32>(1.0, 0.0, 0.0, 1.0);
 }

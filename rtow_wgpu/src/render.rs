@@ -18,8 +18,6 @@ impl PathTracer {
         let shader_module = compile_shader_module(&device);
         let display_pipeline = create_display_pipeline(&device, &shader_module);
 
-        // todo: initilize gpu resources
-
         PathTracer {
             device,
             queue,
