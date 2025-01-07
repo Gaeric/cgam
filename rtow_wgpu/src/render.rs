@@ -27,3 +27,40 @@ fn compile_shader_module(device: &wgpu::Device) -> wgpu::ShaderModule {
         source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(code)),
     })
 }
+
+fn create_display_pipeline(
+    device: &wgpu::Device,
+    shader_module: &wgpu::ShaderModule,
+) -> wgpu::RenderPipeline {
+    device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: Some("display"),
+        layout: None,
+        primitive: wgpu::PrimitiveState {
+            topology: wgpu::PrimitiveTopology::TriangleList,
+            front_face: wgpu::FrontFace::Ccw,
+            polygon_mode: wgpu::PolygonMode::Fill,
+            ..Default::default()
+        },
+        vertex: wgpu::VertexState {
+            module: shader_module,
+            entry_point: Some("display_vs"),
+            compilation_options: PipelineCompilationOptions::default(),
+            buffers: &[],
+        },
+
+        fragment: Some(wgpu::FragmentState {
+            module: shader_module,
+            entry_point: Some("display_fs"),
+            compilation_options: PipelineCompilationOptions::default(),
+            targets: &[Some(wgpu::ColorTargetState {
+                format: wgpu::TextureFormat::Bgra8Unorm,
+                blend: None,
+                write_mask: wgpu::ColorWrites::ALL,
+            })],
+        }),
+        depth_stencil: None,
+        multisample: wgpu::MultisampleState::default(),
+        multiview: None,
+        cache: None,
+    })
+}
