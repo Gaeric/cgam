@@ -1,6 +1,6 @@
 use std::default;
 
-use wgpu::PipelineCompilationOptions;
+use wgpu::{core::command, PipelineCompilationOptions};
 
 pub struct PathTracer {
     device: wgpu::Device,
@@ -25,6 +25,39 @@ impl PathTracer {
             queue,
             display_pipeline,
         }
+    }
+
+    pub fn render_frame(&self, target: &wgpu::TextureView) {
+        let mut encoder = self
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("render frame"),
+            });
+
+        {
+            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("display pass"),
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: target,
+                    resolve_target: None,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
+                        store: wgpu::StoreOp::Store,
+                    },
+                })],
+                ..Default::default()
+            });
+
+            render_pass.set_pipeline(&self.display_pipeline);
+
+            // Draw 1 instance of a polygon with 3 vertices.
+            render_pass.draw(0..3, 0..1);
+
+            // End the render pass by consuming the object
+        }
+
+        let command_buffer = encoder.finish();
+        self.queue.submit(Some(command_buffer));
     }
 }
 
