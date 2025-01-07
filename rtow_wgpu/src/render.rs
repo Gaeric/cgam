@@ -1,6 +1,12 @@
+use std::default;
+
+use wgpu::PipelineCompilationOptions;
+
 pub struct PathTracer {
     device: wgpu::Device,
     queue: wgpu::Queue,
+
+    display_pipeline: wgpu::RenderPipeline,
 }
 
 impl PathTracer {
@@ -10,10 +16,15 @@ impl PathTracer {
         }));
 
         let shader_module = compile_shader_module(&device);
+        let display_pipeline = create_display_pipeline(&device, &shader_module);
 
         // todo: initilize gpu resources
 
-        PathTracer { device, queue }
+        PathTracer {
+            device,
+            queue,
+            display_pipeline,
+        }
     }
 }
 
