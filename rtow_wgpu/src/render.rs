@@ -16,7 +16,7 @@ impl PathTracer {
         }));
 
         let shader_module = compile_shader_module(&device);
-        let display_pipeline = create_display_pipeline(&device, &shader_module);
+        let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
 
         PathTracer {
             device,
@@ -73,8 +73,22 @@ fn compile_shader_module(device: &wgpu::Device) -> wgpu::ShaderModule {
 fn create_display_pipeline(
     device: &wgpu::Device,
     shader_module: &wgpu::ShaderModule,
-) -> wgpu::RenderPipeline {
-    device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+) -> (wgpu::RenderPipeline, wgpu::BindGroupLayout) {
+    let bindgroup_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        label: None,
+        entries: &[wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::FRAGMENT,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Uniform,
+                has_dynamic_offset: false,
+                min_binding_size: None,
+            },
+            count: None,
+        }],
+    });
+
+    let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
         label: Some("display"),
         layout: None,
         primitive: wgpu::PrimitiveState {
@@ -104,5 +118,7 @@ fn create_display_pipeline(
         multisample: wgpu::MultisampleState::default(),
         multiview: None,
         cache: None,
-    })
+    });
+
+    (pipeline, bindgroup_layout)
 }
