@@ -1,16 +1,18 @@
 use std::default;
 
-use bytemuck::{Pod, Zeroable};
 use wgpu::{core::command, PipelineCompilationOptions};
 
 pub struct PathTracer {
     device: wgpu::Device,
     queue: wgpu::Queue,
 
+    uniforms: Uniforms,
+    uniform_buffer: wgpu::Buffer,
+
     display_pipeline: wgpu::RenderPipeline,
 }
 
-#[derive(Clone, Copy, Pod, Zeroable)]
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 #[repr(C)]
 struct Uniforms {
     width: u32,
@@ -26,9 +28,28 @@ impl PathTracer {
         let shader_module = compile_shader_module(&device);
         let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
 
+        // Initialize the uniform buffer
+        let uniforms = Uniforms {
+            width: 800,
+            height: 600,
+        };
+        let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("uniforms"),
+            size: std::mem::size_of::<Uniforms>() as u64,
+            usage: wgpu::BufferUsages::UNIFORM,
+            mapped_at_creation: true,
+        });
+
+        uniform_buffer
+            .slice(..)
+            .get_mapped_range_mut()
+            .copy_from_slice(bytemuck::bytes_of(&uniforms));
+
         PathTracer {
             device,
             queue,
+            uniforms,
+            uniform_buffer,
             display_pipeline,
         }
     }
