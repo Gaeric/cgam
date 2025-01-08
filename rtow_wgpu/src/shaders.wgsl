@@ -1,3 +1,11 @@
+struct Uniforms {
+ wight: u32,
+ height: u32,
+};
+
+@group(0) @binding(0)
+var<uniform> uniforms: Uniforms;
+
 const POSITIONS: array<vec3<f32>, 6> =
     array<vec3<f32>, 6>(
     vec3<f32>(-1.0,  1.0, 0.0),
@@ -24,6 +32,6 @@ fn display_vs(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
 
 @fragment
 fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
-    let color = in.clip_position.xy / vec2<f32>(f32(WIDTH - 1u), f32(HEIGHT - 1u));
+    let color = in.clip_position.xy / vec2<f32>(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
     return vec4<f32>(color, 0.0, 1.0);
 }
