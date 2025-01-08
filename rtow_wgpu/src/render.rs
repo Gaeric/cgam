@@ -24,7 +24,7 @@ struct Uniforms {
 }
 
 impl PathTracer {
-    pub fn new(device: wgpu::Device, queue: wgpu::Queue) -> PathTracer {
+    pub fn new(device: wgpu::Device, queue: wgpu::Queue, width: u32, height: u32) -> PathTracer {
         device.on_uncaptured_error(Box::new(|error| {
             panic!("Aborting due to an error: {}", error);
         }));
@@ -33,10 +33,7 @@ impl PathTracer {
         let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
 
         // Initialize the uniform buffer
-        let uniforms = Uniforms {
-            width: 800,
-            height: 600,
-        };
+        let uniforms = Uniforms { width, height };
         let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("uniforms"),
             size: std::mem::size_of::<Uniforms>() as u64,
