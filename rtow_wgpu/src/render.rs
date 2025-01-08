@@ -9,6 +9,7 @@ pub struct PathTracer {
     uniforms: Uniforms,
     uniform_buffer: wgpu::Buffer,
 
+    display_bindgroup: wgpu::BindGroup,
     display_pipeline: wgpu::RenderPipeline,
 }
 
@@ -44,12 +45,29 @@ impl PathTracer {
             .slice(..)
             .get_mapped_range_mut()
             .copy_from_slice(bytemuck::bytes_of(&uniforms));
+        uniform_buffer.unmap();
+
+        // Create the display pipeline bind group
+        let display_bindgroup = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: None,
+            layout: &display_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                    buffer: &uniform_buffer,
+                    offset: 0,
+                    size: None,
+                }),
+            }],
+        });
 
         PathTracer {
             device,
             queue,
             uniforms,
             uniform_buffer,
+
+            display_bindgroup,
             display_pipeline,
         }
     }
@@ -76,6 +94,7 @@ impl PathTracer {
             });
 
             render_pass.set_pipeline(&self.display_pipeline);
+            render_pass.set_bind_group(0, &self.display_bindgroup, &[]);
 
             // Draw 1 instance of a polygon with 3 vertices.
             render_pass.draw(0..6, 0..1);
