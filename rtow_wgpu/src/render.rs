@@ -1,5 +1,6 @@
 use std::default;
 
+use bytemuck::{Pod, Zeroable};
 use wgpu::{core::command, PipelineCompilationOptions};
 
 pub struct PathTracer {
@@ -7,6 +8,13 @@ pub struct PathTracer {
     queue: wgpu::Queue,
 
     display_pipeline: wgpu::RenderPipeline,
+}
+
+#[derive(Clone, Copy, Pod, Zeroable)]
+#[repr(C)]
+struct Uniforms {
+    width: u32,
+    height: u32,
 }
 
 impl PathTracer {
