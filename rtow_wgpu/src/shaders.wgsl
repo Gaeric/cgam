@@ -1,5 +1,5 @@
 struct Uniforms {
- wight: u32,
+ width: u32,
  height: u32,
 };
 

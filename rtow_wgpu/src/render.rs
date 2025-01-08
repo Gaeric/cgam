@@ -1,6 +1,9 @@
 use std::default;
 
-use wgpu::{core::command, PipelineCompilationOptions};
+use wgpu::{
+    core::command::{self, bundle_ffi::wgpu_render_bundle_set_bind_group},
+    PipelineCompilationOptions,
+};
 
 pub struct PathTracer {
     device: wgpu::Device,
@@ -49,7 +52,7 @@ impl PathTracer {
 
         // Create the display pipeline bind group
         let display_bindgroup = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None,
+            label: Some("unifrom bindgroup"),
             layout: &display_layout,
             entries: &[wgpu::BindGroupEntry {
                 binding: 0,
@@ -138,7 +141,12 @@ fn create_display_pipeline(
 
     let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
         label: Some("display"),
-        layout: None,
+        layout: Some(
+            &device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                bind_group_layouts: &[&bindgroup_layout],
+                ..Default::default()
+            }),
+        ),
         primitive: wgpu::PrimitiveState {
             topology: wgpu::PrimitiveTopology::TriangleList,
             front_face: wgpu::FrontFace::Ccw,
