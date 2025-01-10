@@ -29,6 +29,12 @@ struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
 };
 
+fn sky_color(ray: Ray) -> vec3<f32> {
+    // maybe be some mistake
+    let t = 0.5 * (normalize(ray.direction).y + 1.0);
+    return (1.0 - t) * vec3(1.0) + t * vec3(0.3, 0.5, 1.0);
+}
+
 @vertex
 fn display_vs(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
     var out: VertexOutput;
@@ -47,11 +53,12 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     let uv = in.clip_position.xy / vec2(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
 
     // Map `uv` from y-down (normalized) viewport coordinates to camera coordinates.
+    // left-top   [-aspect_ratio, 1.0]   right-top    [aspect_ratio, 1.0]
+    // left-bottom[-aspect_ratio, -1.0]  right-bottom [aspect_ratio, -1.0]
     let camera_coord_pixel = (2.0 * uv - vec2(1.0)) * vec2(aspect_ratio, -1.0);
 
     let direction = vec3(camera_coord_pixel, -focus_distance);
     let ray = Ray(origin, direction);
 
-    let color = in.clip_position.xy / vec2<f32>(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
-    return vec4<f32>(color, 0.0, 1.0);
+    return vec4<f32>(sky_color(ray), 1.0);
 }
