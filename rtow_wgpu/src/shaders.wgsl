@@ -3,6 +3,12 @@ struct Uniforms {
  height: u32,
 };
 
+struct Ray {
+ origin: vec3<f32>,
+ direction: vec3<f32>,
+}
+
+
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
 
