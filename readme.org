@@ -130,6 +130,15 @@
    book: https://raytracing.github.io/gpu-tracing/book/RayTracingGPUEdition.html
 
    使用rust与wgpu实现一个简单的路径追踪示例
+*** fragment shader中的in.clip_position.xy
+    通过验证和spec，确认在vertex中，使用clip space coord，clip_position和NDC相近，clip_position.xyz除以齐次坐标clip_posiiton.w即可得到对应的NDC坐标。
+
+    而在fragment的运算中，应该是使用viewport coord，.xy使用为在NDC坐标中的point对应的pixel数值，每个pixel中心相对于右上角偏移[0.5, 0.5]
+
+    相关定义见于：
+    - .xy定义 :: https://www.w3.org/TR/WGSL/#position-builtin-value
+    - webgpu coord system :: https://www.w3.org/TR/webgpu/#coordinate-systems
+
 * TODO todolist 
 *** wgpu_rtr
 **** rt_shadow
