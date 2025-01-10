@@ -38,6 +38,14 @@ fn display_vs(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
 
 @fragment
 fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
+    let aspect_ratio = f32(uniforms.width) / f32(uniforms.height);
+
+    // Normalize the viewport coordinates.
+    var uv = in.clip_position.xy / vec2<f32>(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
+
+    // Map `uv` from y-down (normalized) viewport coordinates to camera coordinates.
+    uv = (2.0 * uv - vec2<f32>(1.0, 1.0)) * vec2<f32>(aspect_ratio, -1.0);
+
     let color = in.clip_position.xy / vec2<f32>(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
     return vec4<f32>(color, 0.0, 1.0);
 }
