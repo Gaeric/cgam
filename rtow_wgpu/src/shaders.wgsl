@@ -6,20 +6,24 @@ struct Uniforms {
 struct Ray {
  origin: vec3<f32>,
  direction: vec3<f32>,
-}
+};
 
+struct Sphere {
+ center: vec3<f32>,
+ radius: f32
+};
 
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
 
 const POSITIONS: array<vec3<f32>, 6> =
     array<vec3<f32>, 6>(
-    vec3<f32>(-1.0,  1.0, 0.0),
+    vec3<f32>(-1.0, 1.0, 0.0),
     vec3<f32>(-1.0, -1.0, 0.0),
-    vec3<f32>( 1.0,  1.0, 0.0),
-    vec3<f32>( 1.0,  1.0, 0.0),
+    vec3<f32>(1.0, 1.0, 0.0),
+    vec3<f32>(1.0, 1.0, 0.0),
     vec3<f32>(-1.0, -1.0, 0.0),
-    vec3<f32>( 1.0, -1.0, 0.0),
+    vec3<f32>(1.0, -1.0, 0.0),
 );
 
 const WIDTH: u32 = 800u;
@@ -33,6 +37,30 @@ fn sky_color(ray: Ray) -> vec3<f32> {
     // maybe be some mistake
     let t = 0.5 * (normalize(ray.direction).y + 1.0);
     return (1.0 - t) * vec3(1.0) + t * vec3(0.3, 0.5, 1.0);
+}
+
+fn intersect_sphere(ray: Ray, sphere: Sphere) -> f32 {
+    let v = ray.origin - sphere.center;
+    let a = dot(ray.direction, ray.direction);
+    let d = dot(v, ray.direction);
+    let c = dot(v, v) - sphere.radius * sphere.radius;
+
+    let delta = d * d - a * c;
+
+    if delta < 0.0 {
+        return -1.0;
+    }
+
+    let sqrt_delta = sqrt(delta);
+    let recip_a = 1.0 / a;
+    let md = -d;
+
+    let t = (md - sqrt_delta) * recip_a;
+    if t > 0.0 {
+        return t;
+    }
+
+    return (md + sqrt_delta) * recip_a;
 }
 
 @vertex
@@ -59,6 +87,11 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
 
     let direction = vec3(camera_coord_pixel, -focus_distance);
     let ray = Ray(origin, direction);
+
+    let sphere = Sphere(vec3(0.0, 0.0, -1.0), 0.5);
+    if intersect_sphere(ray, sphere) > 0 {
+        return vec4<f32>(1.0, 0.76, 0.3, 1.0);
+    }
 
     return vec4<f32>(sky_color(ray), 1.0);
 }
