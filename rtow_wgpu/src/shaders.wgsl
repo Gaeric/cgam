@@ -111,7 +111,7 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     }
 
     if closest_t < FLT_MAX {
-        return vec4<f32>(1.0, 0.76, 0.3, 1.0);
+        return vec4<f32>(1.0, 0.76, 0.3, 1.0) * saturate(1.0 - closest_t);
     }
 
     return vec4<f32>(sky_color(ray), 1.0);
