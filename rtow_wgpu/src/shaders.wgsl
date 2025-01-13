@@ -1,3 +1,5 @@
+const FLT_MAX: f32 = 3.40282347E+37;
+
 struct Uniforms {
  width: u32,
  height: u32,
@@ -96,8 +98,19 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     let direction = vec3(camera_coord_pixel, -focus_distance);
     let ray = Ray(origin, direction);
 
-    let sphere = Sphere(vec3(0.0, 0.0, -1.0), 0.5);
-    if intersect_sphere(ray, sphere) > 0 {
+    // let sphere = Sphere(vec3(0.0, 0.0, -1.0), 0.5);
+    // if intersect_sphere(ray, sphere) > 0 {
+    //     return vec4<f32>(1.0, 0.76, 0.3, 1.0);
+    // }
+    var closest_t = FLT_MAX;
+    for (var i = 0u; i < OBJECT_COUNT; i += 1u) {
+        let t = intersect_sphere(ray, SCENE[i]);
+        if t > 0.0 && t < closest_t {
+            closest_t = t;
+        }
+    }
+
+    if closest_t < FLT_MAX {
         return vec4<f32>(1.0, 0.76, 0.3, 1.0);
     }
 
