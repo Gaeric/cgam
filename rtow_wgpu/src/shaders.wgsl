@@ -13,6 +13,14 @@ struct Sphere {
  radius: f32
 };
 
+const OBJECT_COUNT: u32 = 2;
+const SCENE: array<Sphere, OBJECT_COUNT> =
+  array<Sphere, OBJECT_COUNT>(
+    Sphere(vec3(0.0, 0.0, -1.0), 0.5),
+    Sphere(vec3(0.0, -100.5, -1.0), 100.0)
+);
+
+
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
 
