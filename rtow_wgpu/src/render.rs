@@ -1,9 +1,4 @@
-use std::default;
-
-use wgpu::{
-    core::command::{self, bundle_ffi::wgpu_render_bundle_set_bind_group},
-    PipelineCompilationOptions,
-};
+use wgpu::PipelineCompilationOptions;
 
 pub struct PathTracer {
     device: wgpu::Device,
@@ -21,6 +16,7 @@ pub struct PathTracer {
 struct Uniforms {
     width: u32,
     height: u32,
+    frame_count: u32,
 }
 
 impl PathTracer {
@@ -33,7 +29,11 @@ impl PathTracer {
         let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
 
         // Initialize the uniform buffer
-        let uniforms = Uniforms { width, height };
+        let uniforms = Uniforms {
+            width,
+            height,
+            frame_count: 0,
+        };
         let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("uniforms"),
             size: std::mem::size_of::<Uniforms>() as u64,
@@ -72,7 +72,8 @@ impl PathTracer {
         }
     }
 
-    pub fn render_frame(&self, target: &wgpu::TextureView) {
+    pub fn render_frame(&mut self, target: &wgpu::TextureView) {
+        self.uniforms.frame_count += 1;
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {

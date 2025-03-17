@@ -3,6 +3,7 @@ const FLT_MAX: f32 = 3.40282347E+37;
 struct Uniforms {
  width: u32,
  height: u32,
+ frame_count: u32,
 };
 
 struct Ray {
