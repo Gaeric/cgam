@@ -138,6 +138,10 @@
     相关定义见于：
     - .xy定义 :: https://www.w3.org/TR/WGSL/#position-builtin-value
     - webgpu coord system :: https://www.w3.org/TR/webgpu/#coordinate-systems
+*** write buffer
+    对于write buffer的过程了解尚不清晰，需要更加深入的学习
+
+    https://raytracing.github.io/gpu-tracing/book/RayTracingGPUEdition.html#temporalaccumulation/framecount/bufferupdates
 
 * TODO todolist 
 *** wgpu_rtr
