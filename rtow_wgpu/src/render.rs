@@ -7,7 +7,7 @@ pub struct PathTracer {
     uniforms: Uniforms,
     uniform_buffer: wgpu::Buffer,
 
-    display_bindgroup: wgpu::BindGroup,
+    display_bindgroups: [wgpu::BindGroup; 2],
     display_pipeline: wgpu::RenderPipeline,
 }
 
@@ -41,21 +41,14 @@ impl PathTracer {
             mapped_at_creation: false,
         });
 
-        // Create the display pipeline bind group
-        let display_bindgroup = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("unifrom bindgroup"),
-            layout: &display_layout,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
-                    buffer: &uniform_buffer,
-                    offset: 0,
-                    size: None,
-                }),
-            }],
-        });
-
         let radiance_samples = create_sample_texture(&device, width, height);
+
+        let display_bindgroups = create_display_bind_groups(
+            &device,
+            &display_layout,
+            &radiance_samples,
+            &uniform_buffer,
+        );
 
         PathTracer {
             device,
@@ -63,7 +56,7 @@ impl PathTracer {
             uniforms,
             uniform_buffer,
 
-            display_bindgroup,
+            display_bindgroups,
             display_pipeline,
         }
     }
@@ -93,7 +86,11 @@ impl PathTracer {
             });
 
             render_pass.set_pipeline(&self.display_pipeline);
-            render_pass.set_bind_group(0, &self.display_bindgroup, &[]);
+            render_pass.set_bind_group(
+                0,
+                &self.display_bindgroups[(self.uniforms.frame_count % 2) as usize],
+                &[],
+            );
 
             // Draw 1 instance of a polygon with 3 vertices.
             render_pass.draw(0..6, 0..1);
@@ -124,6 +121,65 @@ fn create_sample_texture(device: &wgpu::Device, width: u32, height: u32) -> [wgp
 
     // create two textures with the same parameters
     [device.create_texture(&desc), device.create_texture(&desc)]
+}
+
+fn create_display_bind_groups(
+    device: &wgpu::Device,
+    layout: &wgpu::BindGroupLayout,
+    textures: &[wgpu::Texture; 2],
+    uniform_buffer: &wgpu::Buffer,
+) -> [wgpu::BindGroup; 2] {
+    let views = [
+        textures[0].create_view(&wgpu::TextureViewDescriptor::default()),
+        textures[1].create_view(&wgpu::TextureViewDescriptor::default()),
+    ];
+
+    [
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("unifrom bindgroup"),
+            layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                        buffer: &uniform_buffer,
+                        offset: 0,
+                        size: None,
+                    }),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&views[0]),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::TextureView(&views[1]),
+                },
+            ],
+        }),
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: None,
+            layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::Buffer(wgpu::BufferBinding {
+                        buffer: uniform_buffer,
+                        offset: 0,
+                        size: None,
+                    }),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&views[1]),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::TextureView(&views[0]),
+                },
+            ],
+        }),
+    ]
 }
 
 fn compile_shader_module(device: &wgpu::Device) -> wgpu::ShaderModule {
