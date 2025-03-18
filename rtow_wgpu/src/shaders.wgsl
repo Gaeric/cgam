@@ -35,6 +35,9 @@ const SCENE: array<Sphere, OBJECT_COUNT> =
 
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
+@group(0) @binding(1) var radiance_samples_old: texture_2d<f32>;
+@group(0) @binding(2) var radiance_samples_new: texture_storage_2d<rgba32float, write>;
+
 
 const POSITIONS: array<vec3<f32>, 6> =
     array<vec3<f32>, 6>(
@@ -132,11 +135,26 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
         }
     }
 
+    var radiance_sample: vec3f;
     if closest_hit.t < FLT_MAX {
+        radiance_sample = vec3(0.5 * closest_hit.normal + vec3(0.5));
         // return vec4<f32>(1.0, 0.76, 0.03, 1.0) * saturate(1.0 - closest_t);
         // return vec4(saturate(closest_t) * 0.5);
-        return vec4(0.5 * closest_hit.normal + vec3(0.5), 1.0);
+    } else {
+        radiance_sample = sky_color(ray);
     }
 
-    return vec4<f32>(sky_color(ray), 1.0);
+    // Fetch the old sum of samples
+    var old_sum: vec3f;
+    if uniforms.frame_count > 1 {
+        old_sum = textureLoad(radiance_samples_old, vec2u(in.clip_position.xy), 0).xyz;
+    } else {
+        old_sum = vec3(0.0);
+    }
+
+    // Compute and store the new sum.
+    let new_sum = radiance_sample + old_sum;
+    textureStore(radiance_samples_new, vec2u(in.clip_position.xy), vec4(new_sum, 0.0));
+
+    return vec4<f32>(new_sum / f32(uniforms.frame_count), 1.0);
 }
