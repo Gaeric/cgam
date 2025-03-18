@@ -55,6 +55,8 @@ impl PathTracer {
             }],
         });
 
+        let radiance_samples = create_sample_texture(&device, width, height);
+
         PathTracer {
             device,
             queue,
@@ -102,6 +104,26 @@ impl PathTracer {
         let command_buffer = encoder.finish();
         self.queue.submit(Some(command_buffer));
     }
+}
+
+fn create_sample_texture(device: &wgpu::Device, width: u32, height: u32) -> [wgpu::Texture; 2] {
+    let desc = wgpu::TextureDescriptor {
+        label: Some("randiance samples"),
+        size: wgpu::Extent3d {
+            width,
+            height,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba32Float,
+        usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::STORAGE_BINDING,
+        view_formats: &[],
+    };
+
+    // create two textures with the same parameters
+    [device.create_texture(&desc), device.create_texture(&desc)]
 }
 
 fn compile_shader_module(device: &wgpu::Device) -> wgpu::ShaderModule {
