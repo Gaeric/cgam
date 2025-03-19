@@ -36,7 +36,6 @@ const SCENE: array<Sphere, OBJECT_COUNT> =
     Sphere(vec3(0.0, -100.5, -1.0), 100.0)
 );
 
-
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
 @group(0) @binding(1) var radiance_samples_old: texture_2d<f32>;
@@ -100,6 +99,18 @@ fn xorshift32() -> u32 {
 // subtraction. See Ray Tracing Gems II, Section 14.3.4
 fn rand_f32() -> f32 {
     return bitcast<f32>(0x3f800000u | (xorshift32() >> 9u)) - 1.0;
+}
+
+struct Scatter {
+ attenuation: vec3f,
+ ray: Ray,
+};
+
+fn scatter(input_ray: Ray, hit: Intersection) -> Scatter {
+    let scattered = reflect(input_ray.direction, hit.normal);
+    let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
+    let attenuation = vec3(0.4);
+    return Scatter(attenuation, output_ray);
 }
 
 fn intersect_scene(ray: Ray) -> Intersection {
@@ -194,7 +205,7 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     //     return vec4<f32>(1.0, 0.76, 0.3, 1.0);
     // }
     let hit = intersect_scene(ray);
-    
+
     var radiance_sample: vec3f;
     if is_intersection_valid(hit) {
         radiance_sample = vec3(0.5 * hit.normal + vec3(0.5));
