@@ -127,8 +127,9 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
 
     var closest_hit = Intersection(vec3(0.), FLT_MAX);
     for (var i = 0u; i < OBJECT_COUNT; i += 1u) {
-        var sphere = SCENE[i];
-        sphere.radius += sin(f32(uniforms.frame_count) * 0.02) * 0.2;
+        let sphere = SCENE[i];
+        // var sphere = SCENE[i];
+        // sphere.radius += sin(f32(uniforms.frame_count) * 0.02) * 0.2;
         let hit = intersect_sphere(ray, sphere);
         if hit.t > 0.0 && hit.t < closest_hit.t {
             closest_hit = hit;
