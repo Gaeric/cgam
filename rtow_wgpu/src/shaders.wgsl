@@ -20,6 +20,10 @@ fn no_intersection() -> Intersection {
     return Intersection(vec3(0.), -1.);
 }
 
+fn is_intersection_valid(hit: Intersection) -> bool {
+    return hit.t > 0.0;
+}
+
 struct Sphere {
  center: vec3<f32>,
  radius: f32
@@ -98,6 +102,23 @@ fn rand_f32() -> f32 {
     return bitcast<f32>(0x3f800000u | (xorshift32() >> 9u)) - 1.0;
 }
 
+fn intersect_scene(ray: Ray) -> Intersection {
+    var closest_hit = Intersection(vec3(0.0), FLT_MAX);
+    for (var i = 0u; i < OBJECT_COUNT; i += 1u) {
+        let sphere = SCENE[i];
+        let hit = intersect_sphere(ray, sphere);
+        if hit.t > 0.0 && hit.t < closest_hit.t {
+            closest_hit = hit;
+        }
+    }
+
+    if closest_hit.t < FLT_MAX {
+        return closest_hit;
+    }
+
+    return no_intersection();
+}
+
 fn sky_color(ray: Ray) -> vec3<f32> {
     // maybe be some mistake
     let t = 0.5 * (normalize(ray.direction).y + 1.0);
@@ -172,21 +193,11 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     // if intersect_sphere(ray, sphere) > 0 {
     //     return vec4<f32>(1.0, 0.76, 0.3, 1.0);
     // }
-
-    var closest_hit = Intersection(vec3(0.), FLT_MAX);
-    for (var i = 0u; i < OBJECT_COUNT; i += 1u) {
-        let sphere = SCENE[i];
-        // var sphere = SCENE[i];
-        // sphere.radius += sin(f32(uniforms.frame_count) * 0.02) * 0.2;
-        let hit = intersect_sphere(ray, sphere);
-        if hit.t > 0.0 && hit.t < closest_hit.t {
-            closest_hit = hit;
-        }
-    }
-
+    let hit = intersect_scene(ray);
+    
     var radiance_sample: vec3f;
-    if closest_hit.t < FLT_MAX {
-        radiance_sample = vec3(0.5 * closest_hit.normal + vec3(0.5));
+    if is_intersection_valid(hit) {
+        radiance_sample = vec3(0.5 * hit.normal + vec3(0.5));
         // return vec4<f32>(1.0, 0.76, 0.03, 1.0) * saturate(1.0 - closest_t);
         // return vec4(saturate(closest_t) * 0.5);
     } else {
