@@ -152,9 +152,10 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     let aspect_ratio = f32(uniforms.width) / f32(uniforms.height);
 
     // Offset and normalize the viewport coordinates of the ray.
-    let offset = vec2(f32(uniforms.frame_count % 4) * 0.25 - 0.5,
-                      f32((uniforms.frame_count % 16) / 4) * 0.25 - 0.5);
-
+    init_rng(vec2u(in.clip_position.xy));
+    let offset = vec2(rand_f32() - 0.5, rand_f32() - 0.5);
+    // let offset = vec2(f32(uniforms.frame_count % 4) * 0.25 - 0.5,
+    //                   f32((uniforms.frame_count % 16) / 4) * 0.25 - 0.5);
     var uv = (in.clip_position.xy + offset) / vec2f(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
     // Normalize the viewport coordinates.
     // let uv = in.clip_position.xy / vec2(f32(uniforms.width - 1u), f32(uniforms.height - 1u));
