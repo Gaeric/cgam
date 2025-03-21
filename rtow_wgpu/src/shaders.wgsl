@@ -112,7 +112,7 @@ struct Scatter {
 fn scatter(input_ray: Ray, hit: Intersection) -> Scatter {
     let scattered = reflect(input_ray.direction, hit.normal);
     let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
-    let attenuation = vec3(0.4);
+    let attenuation = vec3(1.0);
     return Scatter(attenuation, output_ray);
 }
 
