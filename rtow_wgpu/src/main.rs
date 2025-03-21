@@ -4,6 +4,7 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
 mod render;
+mod algebra;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
