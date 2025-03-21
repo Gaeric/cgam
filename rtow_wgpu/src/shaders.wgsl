@@ -36,6 +36,8 @@ const SCENE: array<Sphere, OBJECT_COUNT> =
     Sphere(vec3(0.0, -100.5, -1.0), 100.0)
 );
 
+const MAX_PATH_LENGTH: u32 = 6u;
+
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
 @group(0) @binding(1) var radiance_samples_old: texture_2d<f32>;
@@ -198,22 +200,38 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     let camera_coord_pixel = (2.0 * uv - vec2(1.0)) * vec2(aspect_ratio, -1.0);
 
     let direction = vec3(camera_coord_pixel, -focus_distance);
-    let ray = Ray(origin, direction);
+
+    var ray = Ray(origin, direction);
+    var radiance_sample: vec3f = vec3(0.0);
+    var throughput = vec3f(1.0);
+    var path_length = 0u;
+
+    while path_length < MAX_PATH_LENGTH {
+        let hit = intersect_scene(ray);
+        if !is_intersection_valid(hit) {
+            // If no intersection was found, return the color of the sky and terminate the path.
+            radiance_sample += throughput * sky_color(ray);
+            break;
+        }
+
+        let scattered = scatter(ray, hit);
+        throughput *= scattered.attenuation;
+        ray = scattered.ray;
+        path_length += 1u;
+    }
 
     // let sphere = Sphere(vec3(0.0, 0.0, -1.0), 0.5);
     // if intersect_sphere(ray, sphere) > 0 {
     //     return vec4<f32>(1.0, 0.76, 0.3, 1.0);
     // }
-    let hit = intersect_scene(ray);
-
-    var radiance_sample: vec3f;
-    if is_intersection_valid(hit) {
-        radiance_sample = vec3(0.5 * hit.normal + vec3(0.5));
-        // return vec4<f32>(1.0, 0.76, 0.03, 1.0) * saturate(1.0 - closest_t);
-        // return vec4(saturate(closest_t) * 0.5);
-    } else {
-        radiance_sample = sky_color(ray);
-    }
+    // let hit = intersect_scene(ray);
+    // if is_intersection_valid(hit) {
+    //     radiance_sample = vec3(0.5 * hit.normal + vec3(0.5));
+    //     // return vec4<f32>(1.0, 0.76, 0.03, 1.0) * saturate(1.0 - closest_t);
+    //     // return vec4(saturate(closest_t) * 0.5);
+    // } else {
+    //     radiance_sample = sky_color(ray);
+    // }
 
     // Fetch the old sum of samples
     var old_sum: vec3f;
