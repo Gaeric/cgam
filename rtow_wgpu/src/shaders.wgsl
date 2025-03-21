@@ -246,5 +246,7 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     let new_sum = radiance_sample + old_sum;
     textureStore(radiance_samples_new, vec2u(in.clip_position.xy), vec4(new_sum, 0.0));
 
-    return vec4<f32>(new_sum / f32(uniforms.frame_count), 1.0);
+    // Display the average after gamma correction (gamma = 2.2)
+    let color = new_sum / f32(uniforms.frame_count);
+    return vec4(pow(color, vec3(1.0 / 2.2)), 1.0);
 }
