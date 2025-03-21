@@ -1,4 +1,5 @@
 const FLT_MAX: f32 = 3.40282347E+37;
+const EPSILON: f32 = 1e-3;
 
 struct Uniforms {
  width: u32,
@@ -160,8 +161,8 @@ fn intersect_sphere(ray: Ray, sphere: Sphere) -> Intersection {
 
     let t1 = (md - sqrt_delta) * recip_a;
     let t2 = (md + sqrt_delta) * recip_a;
-    let t = select(t2, t1, t1 > 0.0);
-    if t < 0.0 {
+    let t = select(t2, t1, t1 > EPSILON);
+    if t < EPSILON {
         return no_intersection();
     }
 
