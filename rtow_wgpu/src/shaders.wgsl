@@ -37,7 +37,7 @@ const SCENE: array<Sphere, OBJECT_COUNT> =
     Sphere(vec3(0.0, -100.5, -1.0), 100.0)
 );
 
-const MAX_PATH_LENGTH: u32 = 6u;
+const MAX_PATH_LENGTH: u32 = 13u;
 
 @group(0) @binding(0)
 var<uniform> uniforms: Uniforms;
