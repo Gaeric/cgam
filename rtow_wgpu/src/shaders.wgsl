@@ -1,7 +1,12 @@
 const FLT_MAX: f32 = 3.40282347E+37;
 const EPSILON: f32 = 1e-3;
 
+struct CameraUniforms {
+ origin: vec3f,
+}
+
 struct Uniforms {
+ camera: CameraUniforms,
  width: u32,
  height: u32,
  frame_count: u32,
@@ -184,7 +189,7 @@ fn display_vs(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
 
 @fragment
 fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
-    let origin = vec3(0.0);
+    let origin = uniforms.camera.origin;
     let focus_distance = 1.0;
 
     let aspect_ratio = f32(uniforms.width) / f32(uniforms.height);
