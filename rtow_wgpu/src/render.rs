@@ -1,5 +1,10 @@
 use wgpu::PipelineCompilationOptions;
 
+use crate::{
+    algebra::Vec3,
+    camera::{Camera, CameraUniforms},
+};
+
 pub struct PathTracer {
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -14,6 +19,7 @@ pub struct PathTracer {
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 #[repr(C)]
 struct Uniforms {
+    camera: CameraUniforms,
     width: u32,
     height: u32,
     frame_count: u32,
@@ -27,9 +33,11 @@ impl PathTracer {
 
         let shader_module = compile_shader_module(&device);
         let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
+        let camera = Camera::new(Vec3::new(0.0, -0.5, 1.0));
 
         // Initialize the uniform buffer
         let uniforms = Uniforms {
+            camera: *camera.uniforms(),
             width,
             height,
             frame_count: 0,
