@@ -23,6 +23,7 @@ struct Uniforms {
     width: u32,
     height: u32,
     frame_count: u32,
+    _pad: u32,
 }
 
 impl PathTracer {
@@ -41,6 +42,7 @@ impl PathTracer {
             width,
             height,
             frame_count: 0,
+            _pad: 0,
         };
         let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("uniforms"),

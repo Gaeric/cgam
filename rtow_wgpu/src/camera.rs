@@ -6,6 +6,7 @@ use crate::algebra::Vec3;
 #[repr(C)]
 pub struct CameraUniforms {
     origin: Vec3,
+    _pad: u32,
 }
 
 pub struct Camera {
@@ -15,7 +16,7 @@ pub struct Camera {
 impl Camera {
     pub fn new(origin: Vec3) -> Camera {
         Camera {
-            uniforms: CameraUniforms { origin },
+            uniforms: CameraUniforms { origin, _pad: 0 },
         }
     }
 
