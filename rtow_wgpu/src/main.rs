@@ -5,6 +5,7 @@ use winit::window::{Window, WindowBuilder};
 
 mod render;
 mod algebra;
+mod camera;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
