@@ -3,6 +3,9 @@ const EPSILON: f32 = 1e-3;
 
 struct CameraUniforms {
  origin: vec3f,
+ u: vec3f,
+ v: vec3f,
+ w: vec3f,
 }
 
 struct Uniforms {
@@ -208,7 +211,9 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
     // left-bottom[-aspect_ratio, -1.0]  right-bottom [aspect_ratio, -1.0]
     let camera_coord_pixel = (2.0 * uv - vec2(1.0)) * vec2(aspect_ratio, -1.0);
 
-    let direction = vec3(camera_coord_pixel, -focus_distance);
+    let camera_rotation = mat3x3(uniforms.camera.u, uniforms.camera.v, uniforms.camera.w);
+    // translate the direction vector from camera space to world space
+    let direction = camera_rotation * vec3(camera_coord_pixel, -focus_distance);
 
     var ray = Ray(origin, direction);
     var radiance_sample: vec3f = vec3(0.0);
