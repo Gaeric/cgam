@@ -142,7 +142,28 @@
     对于write buffer的过程了解尚不清晰，需要更加深入的学习
 
     https://raytracing.github.io/gpu-tracing/book/RayTracingGPUEdition.html#temporalaccumulation/framecount/bufferupdates
+*** camera
+    在教程中，使用相机原点和相机的uvw坐标系表示相机，但是它使用的是左手坐标系。
 
+    在本节实现中，改用右手坐标系。
+
+    u为指向右侧的基向量，v为指向上侧的基向量，则w为注视点指向相机中心的基向量
+
+    于是有：
+    #+begin_example
+    w = normalize(lookfrom - lookat)
+    u = normalize(cross(vup, w))
+    v = cross(w, u)
+    #+end_example
+
+    形如rtow_cc中的相机变换，具体见于：[[https://raytracing.github.io/books/RayTracingInOneWeekend.html#positionablecamera/positioningandorientingthecamera][rtow_cc camera]]
+
+    In this tutorial, a left-handed coordinate system is used for the camera,
+    while a right-handed coordinate system is adopted here.
+    Under this assumption, the u vector points to the right,
+    the v vector points upward,and the w vector extends from the focus point to
+    the center of the camera. The origin of the uvw coordinate system is located
+    at the center of the camera's uv plane.
 * TODO todolist 
 *** wgpu_rtr
 **** rt_shadow
