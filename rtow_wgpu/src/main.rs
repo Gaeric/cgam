@@ -1,11 +1,13 @@
+use algebra::Vec3;
 use anyhow::{Context, Result};
-use winit::event::{Event, WindowEvent};
-use winit::event_loop::{ControlFlow, EventLoop};
+use camera::Camera;
+use winit::event::{DeviceEvent, Event, MouseScrollDelta, WindowEvent};
+use winit::event_loop::{ControlFlow, DeviceEvents, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
-mod render;
 mod algebra;
 mod camera;
+mod render;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
@@ -13,6 +15,7 @@ const HEIGHT: u32 = 600;
 #[pollster::main]
 async fn main() -> Result<()> {
     let event_loop = EventLoop::new()?;
+    event_loop.listen_device_events(DeviceEvents::Always);
     let window_size = winit::dpi::PhysicalSize::new(WIDTH, HEIGHT);
     let window = WindowBuilder::new()
         .with_inner_size(window_size)
@@ -22,6 +25,11 @@ async fn main() -> Result<()> {
 
     let (device, queue, surface) = connect_to_gpu(&window).await?;
     let mut renderer = render::PathTracer::new(device, queue, WIDTH, HEIGHT);
+    let mut camera = Camera::look_at(
+        Vec3::new(0.0, 0.75, 1.0),
+        Vec3::new(0.0, -0.5, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+    );
 
     event_loop.run(|event, control_handle| {
         control_handle.set_control_flow(ControlFlow::Poll);
@@ -38,10 +46,27 @@ async fn main() -> Result<()> {
                         .texture
                         .create_view(&wgpu::TextureViewDescriptor::default());
 
-                    renderer.render_frame(&render_target);
+                    renderer.render_frame(&camera, &render_target);
 
                     frame.present();
                     window.request_redraw();
+                }
+                WindowEvent::MouseWheel { delta, .. } => {
+                    let delta = match delta {
+                        MouseScrollDelta::PixelDelta(delta) => 0.001 * delta.y as f32,
+                        MouseScrollDelta::LineDelta(_, y) => y * 0.1,
+                    };
+                    camera.zoom(delta);
+                }
+                _ => (),
+            },
+            Event::DeviceEvent { event, .. } => match event {
+                DeviceEvent::MouseWheel { delta } => {
+                    let delta = match delta {
+                        MouseScrollDelta::PixelDelta(delta) => 0.001 * delta.y as f32,
+                        MouseScrollDelta::LineDelta(_, y) => y * 0.1,
+                    };
+                    camera.zoom(delta);
                 }
                 _ => (),
             },

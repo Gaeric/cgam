@@ -1,9 +1,7 @@
+use bytemuck::Zeroable;
 use wgpu::PipelineCompilationOptions;
 
-use crate::{
-    algebra::Vec3,
-    camera::{Camera, CameraUniforms},
-};
+use crate::camera::{Camera, CameraUniforms};
 
 pub struct PathTracer {
     device: wgpu::Device,
@@ -34,15 +32,10 @@ impl PathTracer {
 
         let shader_module = compile_shader_module(&device);
         let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
-        let camera = Camera::look_at(
-            Vec3::new(0.0, 0.75, 1.0),
-            Vec3::new(0.0, -0.5, -1.0),
-            Vec3::new(0.0, 1.0, 0.0),
-        );
 
         // Initialize the uniform buffer
         let uniforms = Uniforms {
-            camera: *camera.uniforms(),
+            camera: CameraUniforms::zeroed(),
             width,
             height,
             frame_count: 0,
@@ -75,7 +68,8 @@ impl PathTracer {
         }
     }
 
-    pub fn render_frame(&mut self, target: &wgpu::TextureView) {
+    pub fn render_frame(&mut self, camera: &Camera, target: &wgpu::TextureView) {
+        self.uniforms.camera = *camera.uniforms();
         self.uniforms.frame_count += 1;
         self.queue
             .write_buffer(&self.uniform_buffer, 0, bytemuck::bytes_of(&self.uniforms));
