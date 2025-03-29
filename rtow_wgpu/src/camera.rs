@@ -39,6 +39,13 @@ impl Camera {
         }
     }
 
+    /// the displacement here refers to movement along the positive w-axis,
+    /// where a positive value indicates moving away from the camera,
+    /// and a negative value indicates moving toward the camera.
+    pub fn zoom(&mut self, displacement: f32) {
+        self.uniforms.origin += self.uniforms.w * displacement;
+    }
+
     pub fn uniforms(&self) -> &CameraUniforms {
         &self.uniforms
     }
