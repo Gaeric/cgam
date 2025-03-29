@@ -6,7 +6,13 @@ use crate::algebra::Vec3;
 #[repr(C)]
 pub struct CameraUniforms {
     origin: Vec3,
-    _pad: u32,
+    _pad0: u32,
+    u: Vec3,
+    _pad1: u32,
+    v: Vec3,
+    _pad2: u32,
+    w: Vec3,
+    _pad3: u32,
 }
 
 pub struct Camera {
@@ -14,9 +20,22 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(origin: Vec3) -> Camera {
+    pub fn look_at(origin: Vec3, target: Vec3, up: Vec3) -> Camera {
+        let w = (origin - target).normalized();
+        let u = up.cross(&w).normalized();
+        let v = w.cross(&u);
+
         Camera {
-            uniforms: CameraUniforms { origin, _pad: 0 },
+            uniforms: CameraUniforms {
+                origin,
+                _pad0: 0,
+                u,
+                _pad1: 1,
+                v,
+                _pad2: 2,
+                w,
+                _pad3: 3,
+            },
         }
     }
 
