@@ -1,7 +1,7 @@
 use algebra::Vec3;
 use anyhow::{Context, Result};
 use camera::Camera;
-use winit::event::{DeviceEvent, Event, MouseScrollDelta, WindowEvent};
+use winit::event::{DeviceEvent, ElementState, Event, MouseScrollDelta, WindowEvent};
 use winit::event_loop::{ControlFlow, DeviceEvents, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
@@ -31,6 +31,8 @@ async fn main() -> Result<()> {
         Vec3::new(0.0, 1.0, 0.0),
     );
 
+    let mut mouse_button_pressed = false;
+
     event_loop.run(|event, control_handle| {
         control_handle.set_control_flow(ControlFlow::Poll);
         match event {
@@ -59,6 +61,9 @@ async fn main() -> Result<()> {
                     camera.zoom(-delta);
                     renderer.reset_samples();
                 }
+                WindowEvent::MouseInput { state, .. } => {
+                    mouse_button_pressed = state == ElementState::Pressed;
+                }
                 _ => (),
             },
             Event::DeviceEvent { event, .. } => match event {
@@ -70,6 +75,13 @@ async fn main() -> Result<()> {
                     camera.zoom(-delta);
                     renderer.reset_samples();
                 }
+                DeviceEvent::MouseMotion { delta: (dx, dy) } => {
+                    if mouse_button_pressed {
+                        camera.pan(dx as f32 * 0.01, dy as f32 * -0.01);
+                        renderer.reset_samples();
+                    }
+                }
+
                 _ => (),
             },
             _ => (),
