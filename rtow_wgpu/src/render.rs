@@ -68,6 +68,10 @@ impl PathTracer {
         }
     }
 
+    pub fn reset_samples(&mut self) {
+        self.uniforms.frame_count = 0;
+    }
+
     pub fn render_frame(&mut self, camera: &Camera, target: &wgpu::TextureView) {
         self.uniforms.camera = *camera.uniforms();
         self.uniforms.frame_count += 1;
