@@ -56,7 +56,7 @@ async fn main() -> Result<()> {
                         MouseScrollDelta::PixelDelta(delta) => 0.001 * delta.y as f32,
                         MouseScrollDelta::LineDelta(_, y) => y * 0.1,
                     };
-                    camera.zoom(delta);
+                    camera.zoom(-delta);
                 }
                 _ => (),
             },
