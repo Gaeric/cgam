@@ -46,6 +46,11 @@ impl Camera {
         self.uniforms.origin += self.uniforms.w * displacement;
     }
 
+    pub fn pan(&mut self, du: f32, dv: f32) {
+        let pan = self.uniforms.u * du + self.uniforms.v * dv;
+        self.uniforms.origin += pan;
+    }
+
     pub fn uniforms(&self) -> &CameraUniforms {
         &self.uniforms
     }
