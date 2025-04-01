@@ -40,11 +40,13 @@ struct Sphere {
  color: vec3f,
 };
 
-const OBJECT_COUNT: u32 = 2;
+const OBJECT_COUNT: u32 = 4;
 const SCENE: array<Sphere, OBJECT_COUNT> =
   array<Sphere, OBJECT_COUNT>(
-    Sphere(vec3(0.0, 0.0, -1.0), 0.5, vec3(0.5, 0.4, 0.0)),
-    Sphere(vec3(0.0, -100.5, -1.0), 100.0, vec3(0.7, 0.4, 0.6))
+    Sphere(vec3(1.0, 0.0, -1.0), 0.5, vec3(0.5, 0.4, 0.0)),
+    Sphere(vec3(-1.0, 0.0, -1.0), 0.5, vec3(0.2, 0.5, 0.2)),
+    Sphere(vec3(0.0, -1.1, -1.0), 0.5, vec3(0.7, 0.4, 0.6)),
+    Sphere(vec3(0.0, 1.1, -1.0), 0.5, vec3(0.2, 0.2, 1.0)),
 );
 
 const MAX_PATH_LENGTH: u32 = 13u;
