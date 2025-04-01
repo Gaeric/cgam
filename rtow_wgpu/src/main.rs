@@ -26,8 +26,8 @@ async fn main() -> Result<()> {
     let (device, queue, surface) = connect_to_gpu(&window).await?;
     let mut renderer = render::PathTracer::new(device, queue, WIDTH, HEIGHT);
     let mut camera = Camera::look_at(
-        Vec3::new(0.0, 0.75, 1.0),
-        Vec3::new(0.0, -0.5, -1.0),
+        Vec3::new(0.0, 0.0, 1.0),
+        Vec3::new(0.0, 0.0, -1.0),
         Vec3::new(0.0, 1.0, 0.0),
     );
 
