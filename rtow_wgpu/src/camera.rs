@@ -17,33 +17,40 @@ pub struct CameraUniforms {
 
 pub struct Camera {
     uniforms: CameraUniforms,
+    center: Vec3,
+    up: Vec3,
+    distance: f32,
+    azimuth: f32,
+    altitude: f32,
 }
 
 impl Camera {
-    pub fn look_at(origin: Vec3, target: Vec3, up: Vec3) -> Camera {
-        let w = (origin - target).normalized();
-        let u = up.cross(&w).normalized();
-        let v = w.cross(&u);
-
-        Camera {
-            uniforms: CameraUniforms {
-                origin,
-                _pad0: 0,
-                u,
-                _pad1: 1,
-                v,
-                _pad2: 2,
-                w,
-                _pad3: 3,
-            },
-        }
+    pub fn with_spherical_coords(
+        center: Vec3,
+        up: Vec3,
+        distance: f32,
+        azimuth: f32,
+        altitude: f32,
+    ) -> Camera {
+        let mut camera = Camera {
+            uniforms: CameraUniforms::zeroed(),
+            center,
+            up,
+            distance,
+            azimuth,
+            altitude,
+        };
+        camera.calculate_uniforms();
+        camera
     }
 
     /// the displacement here refers to movement along the positive w-axis,
     /// where a positive value indicates moving away from the camera,
     /// and a negative value indicates moving toward the camera.
     pub fn zoom(&mut self, displacement: f32) {
-        self.uniforms.origin += self.uniforms.w * displacement;
+        // prevent negative distance
+        self.distance = (self.distance - displacement).max(0.0);
+        self.uniforms.origin = self.center + self.uniforms.w * self.distance;
     }
 
     pub fn pan(&mut self, du: f32, dv: f32) {
@@ -53,5 +60,17 @@ impl Camera {
 
     pub fn uniforms(&self) -> &CameraUniforms {
         &self.uniforms
+    }
+
+    fn calculate_uniforms(&mut self) {
+        // todo: calculate the correct w.
+        let w = Vec3::new(0.0, 0.0, 1.0);
+        let origin = self.center + w * self.distance;
+        let u = self.up.cross(&w).normalized();
+        let v = w.cross(&u);
+        self.uniforms.origin = origin;
+        self.uniforms.u = u;
+        self.uniforms.v = v;
+        self.uniforms.w = w;
     }
 }
