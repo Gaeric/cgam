@@ -27,6 +27,16 @@ pub struct Camera {
 }
 
 impl Camera {
+    pub fn look_at(origin: Vec3, center: Vec3, up: Vec3) -> Camera {
+        let center_to_origin = origin - center;
+        // Prevent distance of 0
+        let distance = center_to_origin.length().max(0.01);
+        let w = center_to_origin.normalized();
+        let altitude = w.y().asin();
+        let azimuth = w.x().atan2(w.z());
+        Self::with_spherical_coords(center, up, distance, azimuth, altitude)
+    }
+
     pub fn with_spherical_coords(
         center: Vec3,
         up: Vec3,
@@ -79,6 +89,7 @@ impl Camera {
             self.altitude.sin(),
             self.altitude.cos() * self.azimuth.cos(),
         );
+        // origin - center
         let w = origin;
         let origin = self.center + w * self.distance;
         let u = self.up.cross(&w).normalized();
