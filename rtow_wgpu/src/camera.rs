@@ -1,3 +1,5 @@
+use std::f32::consts::FRAC_PI_2;
+
 use bytemuck::{Pod, Zeroable};
 
 use crate::algebra::Vec3;
@@ -62,9 +64,20 @@ impl Camera {
         &self.uniforms
     }
 
+    pub fn orbit(&mut self, _du: f32, dv: f32) {
+        self.altitude = (self.altitude + dv).clamp(-FRAC_PI_2, FRAC_PI_2);
+        self.calculate_uniforms();
+    }
+
     fn calculate_uniforms(&mut self) {
         // todo: calculate the correct w.
-        let w = Vec3::new(0.0, 0.0, 1.0);
+        // let w = Vec3::new(0.0, 0.0, 1.0);
+        let origin = Vec3::new(
+            self.altitude.cos() * self.azimuth.sin(),
+            self.altitude.sin(),
+            self.altitude.cos() * self.azimuth.cos(),
+        );
+        let w = -origin;
         let origin = self.center + w * self.distance;
         let u = self.up.cross(&w).normalized();
         let v = w.cross(&u);

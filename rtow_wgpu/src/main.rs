@@ -1,7 +1,7 @@
 use algebra::Vec3;
 use anyhow::{Context, Result};
 use camera::Camera;
-use winit::event::{DeviceEvent, ElementState, Event, MouseScrollDelta, WindowEvent};
+use winit::event::{DeviceEvent, ElementState, Event, MouseButton, MouseScrollDelta, WindowEvent};
 use winit::event_loop::{ControlFlow, DeviceEvents, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
@@ -33,7 +33,8 @@ async fn main() -> Result<()> {
         0.0,
     );
 
-    let mut mouse_button_pressed = false;
+    let mut left_mouse_button_pressed = false;
+    let mut right_mouse_button_pressed = false;
 
     event_loop.run(|event, control_handle| {
         control_handle.set_control_flow(ControlFlow::Poll);
@@ -63,8 +64,13 @@ async fn main() -> Result<()> {
                     camera.zoom(-delta);
                     renderer.reset_samples();
                 }
-                WindowEvent::MouseInput { state, .. } => {
-                    mouse_button_pressed = state == ElementState::Pressed;
+                WindowEvent::MouseInput { state, button, .. } => {
+                    let pressed = state == ElementState::Pressed;
+                    match button {
+                        MouseButton::Left => left_mouse_button_pressed = pressed,
+                        MouseButton::Right => right_mouse_button_pressed = pressed,
+                        _ => (),
+                    }
                 }
                 _ => (),
             },
@@ -78,8 +84,15 @@ async fn main() -> Result<()> {
                     renderer.reset_samples();
                 }
                 DeviceEvent::MouseMotion { delta: (dx, dy) } => {
-                    if mouse_button_pressed {
-                        camera.pan(dx as f32 * 0.01, dy as f32 * -0.01);
+                    let dx = dx as f32 * 0.01;
+                    let dy = dy as f32 * -0.01;
+                    if left_mouse_button_pressed {
+                        camera.orbit(dx, dy);
+                        renderer.reset_samples();
+                    }
+
+                    if right_mouse_button_pressed {
+                        camera.pan(dx, dy);
                         renderer.reset_samples();
                     }
                 }
