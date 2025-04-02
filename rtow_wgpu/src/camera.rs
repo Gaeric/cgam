@@ -1,4 +1,4 @@
-use std::f32::consts::FRAC_PI_2;
+use std::f32::consts::{FRAC_PI_2, PI};
 
 use bytemuck::{Pod, Zeroable};
 
@@ -64,14 +64,15 @@ impl Camera {
         &self.uniforms
     }
 
-    pub fn orbit(&mut self, _du: f32, dv: f32) {
+    pub fn orbit(&mut self, du: f32, dv: f32) {
         const MAX_ALT: f32 = FRAC_PI_2 - 1e-6;
         self.altitude = (self.altitude + dv).clamp(-MAX_ALT, MAX_ALT);
+        self.azimuth += du;
+        self.azimuth %= 2.0 * PI;
         self.calculate_uniforms();
     }
 
     fn calculate_uniforms(&mut self) {
-        // todo: calculate the correct w.
         // let w = Vec3::new(0.0, 0.0, 1.0);
         let origin = Vec3::new(
             self.altitude.cos() * self.azimuth.sin(),
