@@ -65,7 +65,8 @@ impl Camera {
     }
 
     pub fn orbit(&mut self, _du: f32, dv: f32) {
-        self.altitude = (self.altitude + dv).clamp(-FRAC_PI_2, FRAC_PI_2);
+        const MAX_ALT: f32 = FRAC_PI_2 - 1e-6;
+        self.altitude = (self.altitude + dv).clamp(-MAX_ALT, MAX_ALT);
         self.calculate_uniforms();
     }
 
