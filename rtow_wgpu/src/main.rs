@@ -84,6 +84,7 @@ async fn main() -> Result<()> {
                     renderer.reset_samples();
                 }
                 DeviceEvent::MouseMotion { delta: (dx, dy) } => {
+                    // println!("dx is {dx}, dy is {dy}");
                     let dx = dx as f32 * 0.01;
                     let dy = dy as f32 * -0.01;
                     if left_mouse_button_pressed {

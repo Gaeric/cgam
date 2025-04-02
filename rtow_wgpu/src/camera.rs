@@ -78,7 +78,7 @@ impl Camera {
             self.altitude.sin(),
             self.altitude.cos() * self.azimuth.cos(),
         );
-        let w = -origin;
+        let w = origin;
         let origin = self.center + w * self.distance;
         let u = self.up.cross(&w).normalized();
         let v = w.cross(&u);
