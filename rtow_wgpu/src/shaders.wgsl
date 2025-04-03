@@ -144,7 +144,7 @@ struct Scatter {
 };
 
 fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
-    let scattered = reflect(input_ray.direction, hit.normal);
+  let scattered = normalize(hit.normal + (1 - EPSILON) * sample_sphere());
     let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
     let attenuation = material.color;
     return Scatter(attenuation, output_ray);
