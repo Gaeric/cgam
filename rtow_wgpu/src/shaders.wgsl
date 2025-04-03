@@ -1,5 +1,6 @@
 const FLT_MAX: f32 = 3.40282347E+37;
 const EPSILON: f32 = 1e-3;
+const TWO_PI: f32 = 6.2831853;
 
 struct CameraUniforms {
  origin: vec3f,
@@ -120,6 +121,21 @@ fn xorshift32() -> u32 {
 // subtraction. See Ray Tracing Gems II, Section 14.3.4
 fn rand_f32() -> f32 {
     return bitcast<f32>(0x3f800000u | (xorshift32() >> 9u)) - 1.0;
+}
+
+// Uniformly sample a unit sphere centered at the origin
+fn sample_sphere() -> vec3f {
+  let r0 = rand_f32();
+  let r1 = rand_f32();
+
+  // Map r0 to [-1, 1]
+  let y = 1.0 - 2.0 * r0;
+
+  // Compute the projected radius on the xz-plane using Pythagorean theorem
+  let xz_r = sqrt(1.0 - y * y);
+
+  let phi = TWO_PI * r1;
+  return vec3(xz_r * cos(phi), y, xz_r * sin(phi));
 }
 
 struct Scatter {
