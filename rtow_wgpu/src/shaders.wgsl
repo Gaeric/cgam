@@ -23,11 +23,15 @@ struct Ray {
 struct Intersection {
  normal: vec3f,
  t: f32,
- color: vec3f,
+ material_index: u32,
 };
 
+struct Material {
+ color: vec3f,
+}
+
 fn no_intersection() -> Intersection {
-    return Intersection(vec3(0.), -1.0, vec3(0.0));
+    return Intersection(vec3(0.), -1.0, 0);
 }
 
 fn is_intersection_valid(hit: Intersection) -> bool {
@@ -37,17 +41,19 @@ fn is_intersection_valid(hit: Intersection) -> bool {
 struct Sphere {
  center: vec3<f32>,
  radius: f32,
- color: vec3f,
+ material_index: u32,
 };
 
-const OBJECT_COUNT: u32 = 4;
+const OBJECT_COUNT: u32 = 2;
 const SCENE: array<Sphere, OBJECT_COUNT> =
   array<Sphere, OBJECT_COUNT>(
-    Sphere(vec3(1.0, 0.0, -1.0), 0.5, vec3(0.5, 0.4, 0.0)),
-    Sphere(vec3(-1.0, 0.0, -1.0), 0.5, vec3(0.2, 0.5, 0.2)),
-    Sphere(vec3(0.0, -1.1, -1.0), 0.5, vec3(0.7, 0.4, 0.6)),
-    Sphere(vec3(0.0, 1.1, -1.0), 0.5, vec3(0.2, 0.2, 1.0)),
+    Sphere(vec3(0.0, 0.5, 0.0), 0.5, 0),
+    Sphere(vec3(.0, -2e2 - EPSILON, 0.0), 2e2, 0),
 );
+
+const MATERIAL_COUNT: u32 = 1;
+const MATERIALS: array<Material, MATERIAL_COUNT> =
+  array<Material, MATERIAL_COUNT>(Material(vec3(0.5)));
 
 const MAX_PATH_LENGTH: u32 = 13u;
 
@@ -121,10 +127,10 @@ struct Scatter {
  ray: Ray,
 };
 
-fn scatter(input_ray: Ray, hit: Intersection) -> Scatter {
+fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
     let scattered = reflect(input_ray.direction, hit.normal);
     let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
-    let attenuation = hit.color;
+    let attenuation = material.color;
     return Scatter(attenuation, output_ray);
 }
 
@@ -182,7 +188,7 @@ fn intersect_sphere(ray: Ray, sphere: Sphere) -> Intersection {
     let p = point_on_ray(ray, t);
     let N = (p - sphere.center) / sphere.radius;
 
-    return Intersection(N, t, sphere.color);
+    return Intersection(N, t, sphere.material_index);
 }
 
 @vertex
@@ -230,7 +236,8 @@ fn display_fs(in: VertexOutput) -> @location(0) vec4<f32> {
             break;
         }
 
-        let scattered = scatter(ray, hit);
+        let material = MATERIALS[hit.material_index];
+        let scattered = scatter(ray, hit, material);
         throughput *= scattered.attenuation;
         ray = scattered.ray;
         path_length += 1u;
