@@ -29,6 +29,7 @@ struct Intersection {
 
 struct Material {
  color: vec3f,
+ specular: u32,
 }
 
 fn no_intersection() -> Intersection {
@@ -45,16 +46,21 @@ struct Sphere {
  material_index: u32,
 };
 
-const OBJECT_COUNT: u32 = 2;
+const OBJECT_COUNT: u32 = 3;
 const SCENE: array<Sphere, OBJECT_COUNT> =
   array<Sphere, OBJECT_COUNT>(
-    Sphere(vec3(0.0, 0.5, 0.0), 0.5, 0),
-    Sphere(vec3(.0, -2e2 - EPSILON, 0.0), 2e2, 0),
+    Sphere(vec3(-0.6, 0.5, 0), 0.5, 0),
+    Sphere(vec3(0.6, 0.5, 0.0), 0.5, 1),
+    Sphere(vec3(0.0, -2e2 - EPSILON, 0.0), 2e2, 2),
 );
 
-const MATERIAL_COUNT: u32 = 1;
+const MATERIAL_COUNT: u32 = 3;
 const MATERIALS: array<Material, MATERIAL_COUNT> =
-  array<Material, MATERIAL_COUNT>(Material(vec3(0.5)));
+  array<Material, MATERIAL_COUNT>(
+                                  Material(vec3(0.7, 0.5, 0.5), 1),
+                                  Material(vec3(0.5, 0.5, 0.9), 0),
+                                  Material(vec3(0.7, 0.9, 0.2), 0)
+                                  );
 
 const MAX_PATH_LENGTH: u32 = 13u;
 
@@ -125,17 +131,17 @@ fn rand_f32() -> f32 {
 
 // Uniformly sample a unit sphere centered at the origin
 fn sample_sphere() -> vec3f {
-  let r0 = rand_f32();
-  let r1 = rand_f32();
+    let r0 = rand_f32();
+    let r1 = rand_f32();
 
   // Map r0 to [-1, 1]
-  let y = 1.0 - 2.0 * r0;
+    let y = 1.0 - 2.0 * r0;
 
   // Compute the projected radius on the xz-plane using Pythagorean theorem
-  let xz_r = sqrt(1.0 - y * y);
+    let xz_r = sqrt(1.0 - y * y);
 
-  let phi = TWO_PI * r1;
-  return vec3(xz_r * cos(phi), y, xz_r * sin(phi));
+    let phi = TWO_PI * r1;
+    return vec3(xz_r * cos(phi), y, xz_r * sin(phi));
 }
 
 struct Scatter {
@@ -143,8 +149,18 @@ struct Scatter {
  ray: Ray,
 };
 
+fn sample_lambertian(normal: vec3f) -> vec3f {
+    return normal + sample_sphere() * (1.0 - EPSILON);
+}
+
 fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
-  let scattered = normalize(hit.normal + (1 - EPSILON) * sample_sphere());
+    var scattered: vec3f;
+    if material.specular == 1 {
+        scattered = reflect(input_ray.direction, hit.normal);
+    } else {
+        scattered = sample_lambertian(hit.normal);
+    }
+
     let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
     let attenuation = material.color;
     return Scatter(attenuation, output_ray);
