@@ -157,22 +157,49 @@ fn sample_lambertian(normal: vec3f) -> vec3f {
     return normal + sample_sphere() * (1.0 - EPSILON);
 }
 
-fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
-    var scattered: vec3f;
-    let incident = normalize(input_ray.direction);
-    if (material.specular_or_ior == 0.0) {
-      scattered = sample_lambertian(hit.normal);
-    } else {
-      let ior = abs(material.specular_or_ior);
-      scattered = refract(incident, hit.normal, ior);
-      if (material.specular_or_ior > 0.0 || dot(scattered, scattered) == 0.0) {
-        scattered = reflect(incident, hit.normal);
-      }
-    }
+// fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
+//     var scattered: vec3f;
 
-    let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
-    let attenuation = material.color;
-    return Scatter(attenuation, output_ray);
+//     let incident = normalize(input_ray.direction);
+//     let is_front_face = dot(hit.normal, incident) < 0.0;
+//     let is_refract =  material.specular_or_ior < 0.0;
+//     let normal = select(-hit.normal, hit.normal, is_front_face);
+
+//     if (material.specular_or_ior == 0.0) {
+//       scattered = sample_lambertian(normal);
+//     } else {
+//       scattered = reflect(incident, normal);
+//       let ior = select(abs(material.specular_or_ior), 1 / abs(material.specular_or_ior), is_front_face);
+//       let refract_scattered = refract(incident, normal, ior);
+//       scattered = select(refract_scattered, scattered, dot(refract_scattered) == 0.0);
+//     }
+
+//     let output_ray = Ray(point_on_ray(input_ray, hit.t), scattered);
+//     let attenuation = material.color;
+//     return Scatter(attenuation, output_ray);
+// }
+
+fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
+    let incident = normalize(input_ray.direction);
+    let is_front_face = dot(hit.normal, incident) < 0.0;
+    let normal = select(-hit.normal, hit.normal, is_front_face);
+    
+    let is_diffuse = material.specular_or_ior == 0.0;
+    let is_refract = material.specular_or_ior < 0.0;
+    let diffuse_dir = sample_lambertian(normal);
+    
+    let ior = select(
+        abs(material.specular_or_ior),
+        1.0 / abs(material.specular_or_ior),
+        is_front_face
+    );
+    let refract_dir = refract(incident, normal, ior);
+    let reflect_dir = reflect(incident, normal);
+    let specular_dir = select(reflect_dir, refract_dir, length(refract_dir) > 0.001 && is_refract);
+    
+    let scattered = select(specular_dir, diffuse_dir, is_diffuse);
+    
+    return Scatter(material.color, Ray(point_on_ray(input_ray, hit.t), scattered));
 }
 
 fn intersect_scene(ray: Ray) -> Intersection {
