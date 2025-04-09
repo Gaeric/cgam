@@ -159,11 +159,12 @@ fn sample_lambertian(normal: vec3f) -> vec3f {
 
 fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
     var scattered: vec3f;
+    let incident = normalize(input_ray.direction);
     if material.specular_or_ior > 0.0 {
-        scattered = reflect(input_ray.direction, hit.normal);
+        scattered = reflect(incident, hit.normal);
     } else if material.specular_or_ior < 0.0 {
         let ior = abs(material.specular_or_ior);
-        scattered = refract(input_ray.direction, hit.normal, ior);
+        scattered = refract(incident, hit.normal, ior);
     } else {
         scattered = sample_lambertian(hit.normal);
     }
