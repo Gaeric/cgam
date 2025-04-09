@@ -29,7 +29,7 @@ struct Intersection {
 
 struct Material {
  color: vec3f,
- specular: u32,
+ specular_or_ior: f32,
 }
 
 fn no_intersection() -> Intersection {
@@ -46,21 +46,25 @@ struct Sphere {
  material_index: u32,
 };
 
-const OBJECT_COUNT: u32 = 3;
+const OBJECT_COUNT: u32 = 4;
 const SCENE: array<Sphere, OBJECT_COUNT> =
   array<Sphere, OBJECT_COUNT>(
-    Sphere(vec3(-0.6, 0.5, 0), 0.5, 0),
-    Sphere(vec3(0.6, 0.5, 0.0), 0.5, 1),
+    Sphere(vec3(-1.1, 0.5, 0.0), 0.5, 0),
+    Sphere(vec3(0.0, 0.5, 0.0), 0.5, 1),
+    Sphere(vec3(1.1, 0.5, 0.0), 0.5, 3),
+
+    // Gound
     Sphere(vec3(0.0, -2e2 - EPSILON, 0.0), 2e2, 2),
 );
 
-const MATERIAL_COUNT: u32 = 3;
+const MATERIAL_COUNT: u32 = 4;
 const MATERIALS: array<Material, MATERIAL_COUNT> =
   array<Material, MATERIAL_COUNT>(
-                                  Material(vec3(0.7, 0.5, 0.5), 1),
-                                  Material(vec3(0.5, 0.5, 0.9), 0),
-                                  Material(vec3(0.7, 0.9, 0.2), 0)
-                                  );
+    Material(vec3(0.7, 0.5, 0.5), 1),
+    Material(vec3(0.5, 0.5, 0.9), 0),
+    Material(vec3(0.7, 0.9, 0.2), 0),
+    Material(vec3(1.0, 1.0, 1.0), -1.5),
+);
 
 const MAX_PATH_LENGTH: u32 = 13u;
 
@@ -155,8 +159,11 @@ fn sample_lambertian(normal: vec3f) -> vec3f {
 
 fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
     var scattered: vec3f;
-    if material.specular == 1 {
+    if material.specular_or_ior > 0.0 {
         scattered = reflect(input_ray.direction, hit.normal);
+    } else if material.specular_or_ior < 0.0 {
+        let ior = abs(material.specular_or_ior);
+        scattered = refract(input_ray.direction, hit.normal, ior);
     } else {
         scattered = sample_lambertian(hit.normal);
     }
