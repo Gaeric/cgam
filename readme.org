@@ -164,6 +164,12 @@
     the v vector points upward,and the w vector extends from the focus point to
     the center of the camera. The origin of the uvw coordinate system is located
     at the center of the camera's uv plane.
+** physics
+   https://matthias-research.github.io/pages/tenMinutePhysics/
+
+   目前对于我而言，软体物理模拟可能是一个非常重要的功能。我需要掌握更多的物理模拟的知识，尤其是PBD和XPBD方法。因此，需要完成对Ten Minute Physics的学习。
+
+   当前计划按章节划分，理解每一章内容的原理和实现。
 * TODO todolist 
 *** wgpu_rtr
 **** rt_shadow
@@ -175,7 +181,5 @@
     对这本书以翻译为主，以参考实现为标准进行快速浏览，在需要时能够快速查阅
 *** ray tracing gems
     对这本书以翻译为主，做为内容集合进行快速浏览，在需要时能够快速查阅
-*** physics
-    https://matthias-research.github.io/pages/tenMinutePhysics/
 * Tips
   1. WGPU中的fragment着色器只会对由vertex着色器生成的图元（如三角形）覆盖的部分进行处理。对于图元中的每个像素，会调用一次fragment着色器，以计算该像素的颜色和其他相关属性。
