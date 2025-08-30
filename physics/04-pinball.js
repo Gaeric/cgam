@@ -98,12 +98,12 @@ class Ball {
     this.mass = mass;
     this.restitution = restitution;
 
-    console.log("pos is ", pos);
+    // console.log("pos is ", pos);
 
     this.pos = pos.clone();
 
-    console.log("this.pos is ", this.pos);
-    console.log("this.pos x is ", this.pos.x, "this.pos y is ", this.pos.y);
+    // console.log("this.pos is ", this.pos);
+    // console.log("this.pos x is ", this.pos.x, "this.pos y is ", this.pos.y);
     this.vel = vel.clone();
   }
 
@@ -217,9 +217,9 @@ function setupScene() {
 
   for (var i = 0; i < physicsScene.balls.length; i++) {
     var ball = physicsScene.balls[i];
-    console.log("init, ball is ", ball);
-    console.log("init, ball pos is ", ball.pos.x, ball.pos.y);
-    console.log("init, ball vel is ", ball.vel.x, ball.vel.y);
+    // console.log("init, ball is ", ball);
+    // console.log("init, ball pos is ", ball.pos.x, ball.pos.y);
+    // console.log("init, ball vel is ", ball.vel.x, ball.vel.y);
   }
 
   // obstacles
@@ -439,12 +439,12 @@ function handleBallBorderCollision(ball, border) {
     }
   }
 
-  console.log("ball.pos ", ball.pos);
-  console.log("closest is ", closest);
-  console.log("d is ", d);
+  // console.log("ball.pos ", ball.pos);
+  // console.log("closest is ", closest);
+  // console.log("d is ", d);
   // push out
   d.subtractVectors(ball.pos, closest);
-  console.log("d is ", d);
+  // console.log("d is ", d);
 
   var dist = d.length();
   if (dist == 0.0) {
@@ -453,9 +453,9 @@ function handleBallBorderCollision(ball, border) {
   }
   d.scale(1.0 / dist);
 
-  console.log("normal is ", normal);
-  console.log("dist is ", dist);
-  console.log("d is ", d);
+  // console.log("normal is ", normal);
+  // console.log("dist is ", dist);
+  // console.log("d is ", d);
 
   if (d.dot(normal) >= 0.0) {
     if (dist > ball.radius) {
@@ -482,54 +482,54 @@ function simulate() {
   for (var i = 0; i < physicsScene.balls.length; i++) {
     var ball = physicsScene.balls[i];
 
-    console.log("before simulate, ball is ", ball);
-    console.log(
-      "phsicsScene.dt is ",
-      physicsScene.dt,
-      "gravity is ",
-      physicsScene.gravity,
-    );
+    // console.log("before simulate, ball is ", ball);
+    // console.log(
+    //   "phsicsScene.dt is ",
+    //   physicsScene.dt,
+    //   "gravity is ",
+    //   physicsScene.gravity,
+    // );
     ball.simulate(physicsScene.dt, physicsScene.gravity);
-    console.log("after simulate, ball is ", ball);
-    console.log("after simulate, ball pos is ", ball.pos.x, ball.pos.y);
-    console.log("after simulate, ball vel is ", ball.vel.x, ball.vel.y);
+    // console.log("after simulate, ball is ", ball);
+    // console.log("after simulate, ball pos is ", ball.pos.x, ball.pos.y);
+    // console.log("after simulate, ball vel is ", ball.vel.x, ball.vel.y);
 
     for (var j = i + 1; j < physicsScene.balls.length; j++) {
       var ball2 = physicsScene.balls[j];
       handleBallBallCollision(ball, ball2, physicsScene.restitution);
     }
 
-    console.log("after ball ball, ball is ", ball);
-    console.log("after ball ball, ball pos is ", ball.pos.x, ball.pos.y);
-    console.log("after ball ball, ball vel is ", ball.vel.x, ball.vel.y);
+    // console.log("after ball ball, ball is ", ball);
+    // console.log("after ball ball, ball pos is ", ball.pos.x, ball.pos.y);
+    // console.log("after ball ball, ball vel is ", ball.vel.x, ball.vel.y);
 
     for (var j = 0; j < physicsScene.obstacles.length; j++) {
       handleBallObstacleCollision(ball, physicsScene.obstacles[j]);
     }
 
-    console.log("after ball obstacle, ball is ", ball);
-    console.log("after ball obstacle, ball pos is ", ball.pos.x, ball.pos.y);
-    console.log("after ball obstacle, ball vel is ", ball.vel.x, ball.vel.y);
+    // console.log("after ball obstacle, ball is ", ball);
+    // console.log("after ball obstacle, ball pos is ", ball.pos.x, ball.pos.y);
+    // console.log("after ball obstacle, ball vel is ", ball.vel.x, ball.vel.y);
 
     for (var j = 0; j < physicsScene.flippers.length; j++) {
       handleBallFlipperCollision(ball, physicsScene.flippers[j]);
     }
 
-    console.log("after ball flipper, ball is ", ball);
-    console.log("after ball flipper, ball pos is ", ball.pos.x, ball.pos.y);
-    console.log("after ball flipper, ball vel is ", ball.vel.x, ball.vel.y);
+    // console.log("after ball flipper, ball is ", ball);
+    // console.log("after ball flipper, ball pos is ", ball.pos.x, ball.pos.y);
+    // console.log("after ball flipper, ball vel is ", ball.vel.x, ball.vel.y);
 
     handleBallBorderCollision(ball, physicsScene.border);
 
-    console.log("after ball border, ball is ", ball);
-    console.log("after ball border, ball pos is ", ball.pos.x, ball.pos.y);
-    console.log("after ball border, ball vel is ", ball.vel.x, ball.vel.y);
+    // console.log("after ball border, ball is ", ball);
+    // console.log("after ball border, ball pos is ", ball.pos.x, ball.pos.y);
+    // console.log("after ball border, ball vel is ", ball.vel.x, ball.vel.y);
   }
 }
 
 // --------------------------------------------------
 function update() {
-  console.log("update");
+  // console.log("update");
   simulate();
   draw();
   document.getElementById("score").innerHTML = physicsScene.score.toString();
@@ -538,3 +538,69 @@ function update() {
 
 setupScene();
 update();
+
+// -------------------------- user interaction ------------------------
+canvas.addEventListener("touchstart", onTouchStart, false);
+canvas.addEventListener("touchend", onTouchEnd, false);
+canvas.addEventListener("mousedown", onMouseDown, false);
+canvas.addEventListener("mouseup", onMouseUp, false);
+
+function onTouchStart(event) {
+  for (var i = 0; i < event.touches.length; i++) {
+    var touch = event.touches[i];
+
+    var rect = canvas.getBoundingClientRect();
+    var touchPos = new Vector2(
+      (touch.clientX - rect.left) / cScale,
+      simHeight - (touch.clientY - rect.top) / cScale,
+    );
+
+    for (var j = 0; j < physicsScene.flippers.length; j++) {
+      var flipper = physicsScene.flippers[j];
+      if (flipper.select(touchPos)) {
+        flipper.touchIdentifier = touch.identifier;
+      }
+    }
+  }
+}
+
+function onTouchEnd(event) {
+  for (var j = 0; j < physicsScene.flippers.length; j++) {
+    var flipper = physicsScene.flippers[i];
+    if (flipper.touchIdentify < 0) {
+      continue;
+    }
+    var found = false;
+    for (var i = 0; i < event.touches.length; i++) {
+      if (event.touches[j].touchIdentifier == flipper.touchIdentifier) {
+        found = true;
+      }
+    }
+
+    if (!found) {
+      flipper.touchIdentifier = -1;
+    }
+  }
+}
+
+function onMouseDown(event) {
+  // console.log("mouse down");
+  var rect = canvas.getBoundingClientRect();
+  var mousePos = new Vector2(
+    (event.clientX - rect.left) / cScale,
+    simHeight - (event.clientY - rect.top) / cScale,
+  );
+  for (var j = 0; j < physicsScene.flippers.length; j++) {
+    var flipper = physicsScene.flippers[j];
+    if (flipper.select(mousePos)) {
+      flipper.touchIdentifier = 0;
+    }
+  }
+}
+
+function onMouseUp(event) {
+  // console.log("mouse up");
+  for (var i = 0; i < physicsScene.flippers.length; i++) {
+    physicsScene.flippers[i].touchIdentifier = -1;
+  }
+}
