@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Constrained Dynamics</title>
+        <style>
+         body {
+             font-family: vendana;
+             font-size: 15px;
+         }
+         .button {
+             background-color: #606060;
+             border: none;
+             color: white;
+             padding: 10px 32px;
+             font-size: 16px;
+             margin: 4px 12px;
+             cursor: pointer;
+         }
+        </style>
+    </head>
+
+    <body>
+        <button class="button" onclick="setupScene()">Restart</button>
+        <button class="button" onclick="run()">Run</button>
+        <button class="button" onclick="step()">Step</button>
+        <br>
+        PBD <span class="force">0</span> &emsp; Analytic <span class="aforce">0</span>
+        <br>
+
+        <canvas id="myCanvas"></canvas>
+        <script src="./05-bead.js" type="module"></script>
+    </body>
+</html>
