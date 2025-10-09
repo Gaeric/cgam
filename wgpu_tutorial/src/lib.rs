@@ -9,6 +9,7 @@ use winit::{
 };
 
 mod camera;
+mod hdr;
 mod model;
 mod resources;
 mod texture;
@@ -47,6 +48,7 @@ struct State<'a> {
     // diffuse_texture: texture::Texture,
     depth_texture: texture::Texture,
 
+    hdr: hdr::HdrPipeline,
     debug_material: model::Material,
 }
 
@@ -269,6 +271,8 @@ impl<'a> State<'a> {
             usage: wgpu::BufferUsages::VERTEX,
         });
 
+        let hdr = hdr::HdrPipeline::new(&device, &config);
+
         let light_uniform = LightUniform {
             position: [2.0, 2.0, 2.0],
             _padding: 0,
@@ -335,9 +339,10 @@ impl<'a> State<'a> {
             create_render_pipeline(
                 &device,
                 &render_pipeline_layout,
-                config.format,
+                hdr.format(),
                 Some(texture::Texture::DEPTH_FORMAT),
                 &[model::ModelVertex::desc(), InstanceRaw::desc()],
+                wgpu::PrimitiveTopology::TriangleList,
                 shader,
             )
         };
@@ -356,9 +361,10 @@ impl<'a> State<'a> {
             create_render_pipeline(
                 &device,
                 &layout,
-                config.format,
+                hdr.format(),
                 Some(texture::Texture::DEPTH_FORMAT),
                 &[model::ModelVertex::desc()],
+                wgpu::PrimitiveTopology::TriangleList,
                 shader,
             )
         };
@@ -394,6 +400,7 @@ impl<'a> State<'a> {
 
             depth_texture,
 
+            hdr,
             debug_material,
         }
     }
@@ -411,6 +418,8 @@ impl<'a> State<'a> {
             self.depth_texture =
                 texture::Texture::create_depth_texture(&self.device, &self.config, "depth_texture");
             self.projection.resize(new_size.width, new_size.height);
+            self.hdr
+                .resize(&self.device, new_size.width, new_size.height);
         }
     }
 
@@ -467,9 +476,10 @@ impl<'a> State<'a> {
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
-        let view = output
-            .texture
-            .create_view(&wgpu::TextureViewDescriptor::default());
+        let view = output.texture.create_view(&wgpu::TextureViewDescriptor {
+            format: Some(self.config.format.add_srgb_suffix()),
+            ..Default::default()
+        });
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
@@ -480,7 +490,8 @@ impl<'a> State<'a> {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
+                    view: self.hdr.view(),
+                    // view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
@@ -500,7 +511,6 @@ impl<'a> State<'a> {
                     }),
                     stencil_ops: None,
                 }),
-                // depth_stencil_attachment: None,
                 occlusion_query_set: None,
                 timestamp_writes: None,
             });
@@ -525,14 +535,9 @@ impl<'a> State<'a> {
                 &self.camera_bind_group,
                 &self.light_bind_group,
             );
-
-            // render_pass.draw_model_instanced(
-            //     &self.obj_model,
-            //     0..self.instances.len() as u32,
-            //     &self.camera_bind_group,
-            //     &self.light_bind_group,
-            // );
         }
+
+        self.hdr.process(&mut encoder, &view);
 
         self.queue.submit(std::iter::once(encoder.finish()));
         output.present();
@@ -666,6 +671,7 @@ fn create_render_pipeline(
     color_format: wgpu::TextureFormat,
     depth_format: Option<wgpu::TextureFormat>,
     vertex_layouts: &[wgpu::VertexBufferLayout],
+    topology: wgpu::PrimitiveTopology,
     shader: wgpu::ShaderModuleDescriptor,
 ) -> wgpu::RenderPipeline {
     let shader = device.create_shader_module(shader);
@@ -694,7 +700,7 @@ fn create_render_pipeline(
         }),
 
         primitive: wgpu::PrimitiveState {
-            topology: wgpu::PrimitiveTopology::TriangleList,
+            topology,
             strip_index_format: None,
             front_face: wgpu::FrontFace::Ccw,
             cull_mode: Some(wgpu::Face::Back),
