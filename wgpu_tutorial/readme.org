@@ -1,0 +1,10 @@
+** Buffers and Indices
+   Create a more complex shape than the one we made (aka. more than three triangles) using a vertex buffer and an index buffer. Toggle between the two with the space key.
+** Textures and bind groups
+   Create another texture and swap it out when you press the space key.
+** Uniform buffers and a 3d camera
+   Have our model rotate on its own independently of the camera. Hint: you'll need another matrix for this.
+** Instancing
+   Modify the position and/or rotation of the instances every frame.
+** The Depth Buffer
+   Since the depth buffer is a texture, we can sample it in the shader. Because it's a depth texture, we'll have to use the sampler_comparison uniform type and the textureSampleCompare function instead of sampler and sampler2D respectively. Create a bind group for the depth texture (or reuse an existing one), and render it to the screen.
