@@ -22,12 +22,12 @@ instant = "0.1.13"
 [dependencies.image]
 version = "0.24"
 default-features = false
-features = ["png", "jpeg"]
+features = ["png", "jpeg", "hdr"]
 
 [target.'cfg(target_tarch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1.6"
 console_log = "1.0"
-wgpu = { version = "22.1.0", features = ["webgl"]}
+wgpu = { version = "22.1.0"}
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4.30"
 web-sys = {version = "0.3", features = [
