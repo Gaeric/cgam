@@ -123,3 +123,29 @@ class Bead {
 }
 
 // --------------------------------------------------
+class AnalyticBead {
+  constructor(radius, beadRadius, mass, angle) {
+    this.radius = radius;
+    this.beadRadius = beadRadius;
+    this.mass = mass;
+    this.angle = angle;
+    this.omega = 0.0;
+  }
+
+  simulate(dt, gravity) {
+    var acc = (-gravity / this.radius) * Math.sin(this.angle);
+    this.omega += acc * dt;
+    this.angle += this.omega * dt;
+
+    var centrifugalForce = this.omega * this.omega * this.radius;
+    var force = centrifugalForce + Math.cos(this.angle) * Math.abs(gravity);
+    return force;
+  }
+
+  getPos() {
+    return new Vector2(
+      Math.sin(this.angle) * this.radius,
+      -Math.cos(this.angle) * this.radius,
+    );
+  }
+}
