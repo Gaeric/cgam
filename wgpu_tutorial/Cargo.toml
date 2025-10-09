@@ -15,6 +15,11 @@ pollster = "0.3"
 cfg-if= "1"
 bytemuck = { version = "1.16.3", features = ["derive"] }
 
+[dependencies.image]
+version = "0.24"
+default-features = false
+features = ["png", "jpeg"]
+
 [target.'cfg(target_tarch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1.6"
 console_log = "1.0"
