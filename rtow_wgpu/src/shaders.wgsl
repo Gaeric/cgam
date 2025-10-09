@@ -3,33 +3,33 @@ const EPSILON: f32 = 1e-3;
 const TWO_PI: f32 = 6.2831853;
 
 struct CameraUniforms {
- origin: vec3f,
- u: vec3f,
- v: vec3f,
- w: vec3f,
+    origin: vec3f,
+    u: vec3f,
+    v: vec3f,
+    w: vec3f,
 }
 
 struct Uniforms {
- camera: CameraUniforms,
- width: u32,
- height: u32,
- frame_count: u32,
+    camera: CameraUniforms,
+    width: u32,
+    height: u32,
+    frame_count: u32,
 };
 
 struct Ray {
- origin: vec3<f32>,
- direction: vec3<f32>,
+    origin: vec3<f32>,
+    direction: vec3<f32>,
 };
 
 struct Intersection {
- normal: vec3f,
- t: f32,
- material_index: u32,
+    normal: vec3f,
+    t: f32,
+    material_index: u32,
 };
 
 struct Material {
- color: vec3f,
- specular_or_ior: f32,
+    color: vec3f,
+    specular_or_ior: f32,
 }
 
 fn no_intersection() -> Intersection {
@@ -41,9 +41,9 @@ fn is_intersection_valid(hit: Intersection) -> bool {
 }
 
 struct Sphere {
- center: vec3<f32>,
- radius: f32,
- material_index: u32,
+    center: vec3<f32>,
+    radius: f32,
+    material_index: u32,
 };
 
 const OBJECT_COUNT: u32 = 4;
@@ -92,7 +92,7 @@ struct VertexOutput {
 };
 
 struct Rng {
- state: u32,
+    state: u32,
 };
 
 var<private> rng: Rng;
@@ -149,8 +149,8 @@ fn sample_sphere() -> vec3f {
 }
 
 struct Scatter {
- attenuation: vec3f,
- ray: Ray,
+    attenuation: vec3f,
+    ray: Ray,
 };
 
 fn sample_lambertian(normal: vec3f) -> vec3f {
@@ -183,11 +183,11 @@ fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
     let incident = normalize(input_ray.direction);
     let is_front_face = dot(hit.normal, incident) < 0.0;
     let normal = select(-hit.normal, hit.normal, is_front_face);
-    
+
     let is_diffuse = material.specular_or_ior == 0.0;
     let is_refract = material.specular_or_ior < 0.0;
     let diffuse_dir = sample_lambertian(normal);
-    
+
     let ior = select(
         abs(material.specular_or_ior),
         1.0 / abs(material.specular_or_ior),
@@ -196,9 +196,9 @@ fn scatter(input_ray: Ray, hit: Intersection, material: Material) -> Scatter {
     let refract_dir = refract(incident, normal, ior);
     let reflect_dir = reflect(incident, normal);
     let specular_dir = select(reflect_dir, refract_dir, length(refract_dir) > 0.001 && is_refract);
-    
+
     let scattered = select(specular_dir, diffuse_dir, is_diffuse);
-    
+
     return Scatter(material.color, Ray(point_on_ray(input_ray, hit.t), scattered));
 }
 
