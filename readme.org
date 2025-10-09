@@ -183,3 +183,8 @@
     对这本书以翻译为主，做为内容集合进行快速浏览，在需要时能够快速查阅
 * Tips
   1. WGPU中的fragment着色器只会对由vertex着色器生成的图元（如三角形）覆盖的部分进行处理。对于图元中的每个像素，会调用一次fragment着色器，以计算该像素的颜色和其他相关属性。
+
+  2. 关于lambertian漫反射的问题
+     在球面上均匀采样并投影到半球上，可以获得符合lambertian反射的分布，参考issue如下：
+
+     https://github.com/RayTracing/raytracing.github.io/discussions/1380
