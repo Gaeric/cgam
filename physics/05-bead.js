@@ -149,3 +149,113 @@ class AnalyticBead {
     );
   }
 }
+// --------------------------------------------------
+
+function setupScene() {
+  physicsScene.paused = true;
+
+  physicsScene.wireCenter.x = simWidth / 2.0;
+  physicsScene.wireCenter.y = simHeight / 2.0;
+  physicsScene.wireRadius = simMinWidth * 0.4;
+
+  var pos = new Vector2(
+    physicsScene.wireCenter.x + physicsScene.wireRadius,
+    physicsScene.wireCenter.y,
+  );
+
+  physicsScene.bead = new Bead(0.1, 1.0, pos);
+
+  physicsScene.analyticBead = new AnalyticBead(
+    physicsScene.wireRadius,
+    0.1,
+    1.0,
+    0.5 * Math.PI,
+  );
+
+  document.getElementById("force").innerHTML = (0.0).toFixed(3);
+  document.getElementById("aforce").innerHTML = (0.0).toFixed(3);
+}
+
+// draw --------------------------------------------------
+
+function drawCircle(pos, radius, filled) {
+  c.beginPath();
+  c.arc(cX(pos), cY(pos), cScale * radius, 0.0, 2.0 * Math.PI);
+  c.closePath();
+  if (filled) {
+    c.fill();
+  } else {
+    c.stroke();
+  }
+}
+
+function draw() {
+  c.clearRect(0, 0, canvas.width, canvas.height);
+
+  c.fillStyle = "#FF0000";
+  c.lineWidth = 2.0;
+  drawCircle(physicsScene.wireCenter, physicsScene.wireRadius, false);
+
+  c.fillStyle = "#FF0000";
+  var bead = physicsScene.bead;
+
+  drawCircle(bead.pos, bead.radius, true);
+
+  c.fillStyle = "#00FF00";
+
+  var analyticBead = physicsScene.analyticBead;
+  var pos = analyticBead.getPos();
+  pos.add(physicsScene.wireCenter);
+  drawCircle(pos, analyticBead.beadRadius, true);
+}
+
+// --------------------------------------------------
+function simulate() {
+  if (physicsScene.paused) {
+    return;
+  }
+
+  var sdt = physicsScene.dt / physicsScene.numSteps;
+  var force, analyticForce;
+
+  for (var step = 0; step < physicsScene.numSteps; step++) {
+    physicsScene.bead.startStep(sdt, physicsScene.gravity);
+
+    var lambda = physicsScene.bead.keepOnWire(
+      physicsScene.wireCenter,
+      physicsScene.wireRadius,
+    );
+
+    force = Math.abs(lambda / sdt / sdt);
+
+    physicsScene.bead.endStep(sdt);
+
+    analyticForce = physicsScene.analyticBead.simulate(
+      sdt,
+      -physicsScene.gravity.y,
+    );
+  }
+
+  document.getElementById("force").innerHTML = force.toFixed(3);
+  document.getElementById("aforce").innerHTML = analyticForce.toFixed(3);
+}
+
+// --------------------------------------------------
+function run() {
+  physicsScene.paused = false;
+}
+
+function step() {
+  physicsScene.paused = false;
+  simulate();
+  physicsScene.paused = true;
+}
+
+function update() {
+  simulate();
+  draw();
+  requestAnimationFrame(update);
+}
+
+setupScene();
+update();
