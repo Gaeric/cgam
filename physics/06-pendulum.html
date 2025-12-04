@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Pendulum</title>
+    </head>
+    <body>
+        <button class="button" onclick="setupScene()">Restart</button>
+        <button class="button" onclick="run()">Run</button>
+        <button class="button" onclick="setup()">Step</button>
+        <p>Number of sub-steps:
+            <input type="range" min="0" max="5" value="5" id ="stepsSlider" class="slider"/>
+            <span id="steps">10000</span>
+        </p>
+
+        <canvas id="myCanvas"></canvas>
+
+        <script src="./06-pendulum.js"></script>
+    </body>
+</html>
