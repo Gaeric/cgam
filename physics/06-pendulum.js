@@ -67,9 +67,9 @@ class Pendulum {
     for (var i = 1; i < p.masses.length; i++) {
       var dx = p.pos[i].x - p.pos[i - 1].x;
       var dy = p.pos[i].y - p.pos[i - 1].y;
-      var d = Math.sqrt(dx * dy + dy * dy);
+      var d = Math.sqrt(dx * dx + dy * dy);
       var w0 = p.masses[i - 1] > 0.0 ? 1.0 / p.masses[i - 1] : 0.0;
-      var w1 = p.masses[i] > 0.0 ? 1.0 / p.masses[i - 1] : 0.0;
+      var w1 = p.masses[i] > 0.0 ? 1.0 / p.masses[i] : 0.0;
       var corr = (p.lengths[i] - d) / d / (w0 + w1);
       p.pos[i - 1].x -= w0 * corr * dx;
       p.pos[i - 1].y -= w0 * corr * dy;
