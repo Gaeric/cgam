@@ -56,12 +56,22 @@ class Pendulum {
 
   simulatePBD(dt, gravity) {
     var p = this;
+    // console.log(`masses length ${p.masses.length}`);
     for (var i = 1; i < p.masses.length; i++) {
+      // console.log(
+      //   `before pre slover: vel[${i}] is ${p.vel[i].x} ${p.vel[i].y}`,
+      // );
+      // console.log(`before pre slover: pos ${p.pos[i].x} ${p.pos[i].y}`);
+
       p.vel[i].y += dt * scene.gravity;
       p.prevPos[i].x = p.pos[i].x;
       p.prevPos[i].y = p.pos[i].y;
       p.pos[i].x += p.vel[i].x * dt;
       p.pos[i].y += p.vel[i].y * dt;
+
+      // console.log(
+      //   `after pre slover: pos[${i}] x: ${p.pos[i].x} ${p.pos[i].y} `,
+      // );
     }
 
     for (var i = 1; i < p.masses.length; i++) {
@@ -75,6 +85,8 @@ class Pendulum {
       p.pos[i - 1].y -= w0 * corr * dy;
       p.pos[i].x += w1 * corr * dx;
       p.pos[i].y += w1 * corr * dy;
+
+      // console.log(`after slover: pos[${i}] x: ${p.pos[i].x} ${p.pos[i].y} `);
     }
 
     for (var i = 1; i < p.masses.length; i++) {
@@ -259,6 +271,8 @@ function setupScene() {
   var lengths = [];
   var masses = [];
 
+  console.log(`sceneNr is ${sceneNr}`);
+
   switch (sceneNr % 6) {
     case 0: {
       lengths = [0.15, 0.15, 0.15];
@@ -297,7 +311,7 @@ function setupScene() {
 
   scene.pendulumAnalytic = null;
 
-  scene.pendulumPBD = new Pendulum(true, "#FF3030", masses, length, angles);
+  scene.pendulumPBD = new Pendulum(true, "#FFEEFF", masses, lengths, angles);
 
   if (masses.length <= 3) {
     scene.pendulumAnalytic = new Pendulum(
@@ -331,6 +345,7 @@ function draw() {
 
 function simulate() {
   if (scene.paused) {
+    console.log("scene paused");
     return;
   }
   var sdt = scene.dt / scene.numSubSteps;
@@ -380,7 +395,7 @@ function step() {
 function update() {
   simulate();
   draw();
-  // requestAnimationFrame(update);
+  requestAnimationFrame(update);
 }
 
 setupScene();
