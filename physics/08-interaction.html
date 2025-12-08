@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Interaction</title>
+    </head>
+    <style>
+     body {
+         font-family: vendana;
+         font-size: 15px;
+     }
+     .button {
+         background-color: #606060;
+         border: none;
+         color: white;
+         padding: 15px 32px;
+         font-size: 16px;
+         margin: 4px 2px;
+         cursor: pointer;
+     }
+    </style>
+    <body>
+        <h1>User Interaction Demo</h1>
+        <button id="buttonRun" class="button" onclick="run()">Run</button>
+        <button class="button" onclick="restart()">Restart</button>
+        <br/>
+        <br/>
+        <div id="container"></div>
+
+        <script src="https://unpkg.com/three@0.139.2/build/three.min.js"></script>
+        <script src="https://unpkg.com/three@0.139.2/examples/js/controls/OrbitControls.js"></script>
+
+        <script src="./08-interaction.js"></script>
+    </body>
+</html>
