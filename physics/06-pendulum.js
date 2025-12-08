@@ -224,7 +224,7 @@ class Pendulum {
       i = (i + 2) % this.trail.length;
       while (i != this.trailLast) {
         c.lineTo(this.trail[i], this.trail[i + 1]);
-        i + ((i + 2) % this.trail.length);
+        i = (i + 2) % this.trail.length;
       }
 
       c.stroke();
@@ -311,12 +311,12 @@ function setupScene() {
 
   scene.pendulumAnalytic = null;
 
-  scene.pendulumPBD = new Pendulum(true, "#FFEEFF", masses, lengths, angles);
+  scene.pendulumPBD = new Pendulum(true, "#001100", masses, lengths, angles);
 
   if (masses.length <= 3) {
     scene.pendulumAnalytic = new Pendulum(
       false,
-      "#00FF00",
+      "#110011",
       masses,
       lengths,
       angles,
@@ -345,7 +345,6 @@ function draw() {
 
 function simulate() {
   if (scene.paused) {
-    console.log("scene paused");
     return;
   }
   var sdt = scene.dt / scene.numSubSteps;
