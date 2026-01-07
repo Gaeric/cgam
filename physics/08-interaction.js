@@ -255,7 +255,7 @@ class Grabber {
 }
 
 function onPointer(evt) {
-  event.preventDefault();
+  preventDefault();
   if (evt.type == "pointerdown") {
     gGrabber.start(evt.clientX, evt.clientY);
     gMouseDown = true;
