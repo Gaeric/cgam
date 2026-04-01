@@ -21,9 +21,11 @@
     </head>
     <body>
         <h1>Spatial Hashing</h1>
-        <button id="buttonRun" onclice="run()" class="button">Run</button>
-        <button onclick="restart()" class="button">Restart</button>
-        <input name="" type="checkbox" value="" onclick="onShowColl()"/>
+        <!-- <button id="buttonRun" onclick="run()" class="button">Run</button>
+             <button onclick="restart()" class="button">Restart</button> -->
+        <button id="buttonRun" class="button">Run</button>
+        <button id="buttonRestart" class="button">Restart</button>
+        <input id="checkColl" type="checkbox"/>
         <p>Show collisions</p>
         <span id="particleCount">0</span> particles,
         <span id="ms">0.000</span> ms per frame
@@ -35,6 +37,6 @@
         <script src="https://unpkg.com/three@0.139.2/build/three.min.js"></script>
         <script src="https://unpkg.com/three@0.139.2/examples/js/controls/OrbitControls.js"></script>
 
-        <script src="./11-hashing.js"></script>
+        <script type="module" src="./11-hashing.js"></script>
     </body>
 </html>

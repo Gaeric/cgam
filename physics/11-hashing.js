@@ -1,162 +1,21 @@
+import {
+  Hash,
+  vecAdd,
+  vecCopy,
+  vecDot,
+  vecLengthSquared,
+  vecScale,
+  vecSetDiff,
+} from "./utils.js";
+
 var threeScene;
 var renderer;
 var camera;
 var cameraControl;
 
 // --------------------------------------------------
-class Hash {
-  constructor(spacing, maxNumObjects) {
-    this.spacing = spacing;
-    this.tableSize = 2 * maxNumObjects;
-    this.cellStart = new Int32Array(this.tableSize + 1);
-    this.cellEntries = new Int32Array(maxNumObjects);
-    this.queryIds = new Int32Array(maxNumObjects);
-    this.querySize = 0;
-  }
-
-  hashCoords(xi, yi, zi) {
-    // fantasy function
-    var h = (xi * 92837111) ^ (yi * 689287499) ^ (zi * 283923481);
-    return Math.abs(h) % this.tableSize;
-  }
-
-  intCoord(coord) {
-    return Math.floor(coord / this.spacing);
-  }
-
-  hashPos(pos, nr) {
-    return this.hashCoords(
-      this.intCoord(pos[3 * nr]),
-      this.intCoord(pos[3 * nr + 1]),
-      this.intCoord(pos[3 * nr + 2]),
-    );
-  }
-
-  create(pos) {
-    var numObjects = Math.min(pos.length / 3, this.cellEntries.length);
-
-    // determine cell sizes
-    this.cellStart.fill(0);
-    this.cellEntries.fill(0);
-
-    for (var i = 0; i < numObjects; i++) {
-      var h = this.hashPos(pos, i);
-      this.cellStart[h]++;
-    }
-
-    // determine cells starts
-    var start = 0;
-    for (var i = 0; i < this.tableSize; i++) {
-      start += this.cellStart[i];
-      this.cellStart[i] = start;
-    }
-
-    // guard
-    this.cellStart[this.tableSize] = start;
-
-    // fill in objects ids
-    for (var i = 0; i < numObjects; i++) {
-      var h = this.hashPos(pos, i);
-      this.cellStart[h]--;
-      this.cellEntries[this.cellStart[h]] = i;
-    }
-  }
-
-  query(pos, nr, maxDist) {
-    var x0 = this.intCoord(pos[3 * nr] - maxDist);
-    var y0 = this.intCoord(pos[3 * nr + 1] - maxDist);
-    var z0 = this.intCoord(pos[3 * nr + 2] - maxDist);
-
-    var x1 = this.intCoord(pos[3 * nr] + maxDist);
-    var y1 = this.intCoord(pos[3 * nr + 1] + maxDist);
-    var z1 = this.intCoord(pos[3 * nr + 2] + maxDist);
-
-    this.querySize = 0;
-
-    for (var xi = x0; xi <= x1; xi++) {
-      for (var yi = y0; yi <= y1; yi++) {
-        for (var zi = z0; zi <= z1; zi++) {
-          var h = this.hashCoords(xi, yi, zi);
-          var start = this.cellStart[h];
-          var end = this.cellStart[h + 1];
-
-          for (var i = start; i < end; i++) {
-            this.queryIds[this.querySize] = this.cellEntries[i];
-            this.querySize++;
-          }
-        }
-      }
-    }
-  }
-}
 
 // ----- math on vector arrays ----------
-
-function vecScale(a, anr, scale) {
-  anr *= 3;
-  a[anr++] *= scale;
-  a[anr++] *= scale;
-  a[anr] *= scale;
-}
-
-function vecCopy(a, anr, b, bnr) {
-  anr *= 3;
-  bnr *= 3;
-  a[anr++] = b[bnr++];
-  a[anr++] = b[bnr++];
-  a[anr] = b[bnr];
-}
-
-function vecCopy(a, anr, b, bnr) {
-  anr *= 3;
-  bnr *= 3;
-  a[anr++] = b[bnr++];
-  a[anr++] = b[bnr++];
-  a[anr++] = b[bnr++];
-}
-
-function vecAdd(a, anr, b, bnr, scale = 1.0) {
-  anr *= 3;
-  bnr *= 3;
-
-  a[anr++] += b[bnr++] * scale;
-  a[anr++] += b[bnr++] * scale;
-  a[anr] += b[bnr] * scale;
-}
-
-function vecSetDiff(dst, dnr, a, anr, b, bnr, scale = 1.0) {
-  dnr *= 3;
-  anr *= 3;
-  bnr *= 3;
-  dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
-  dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
-  dst[dnr] = (a[anr] - b[bnr]) * scale;
-}
-
-function vecLengthSquared(a, anr) {
-  anr *= 3;
-  let a0 = a[anr],
-    a1 = a[anr + 1],
-    a2 = a[anr + 2];
-
-  return a0 * a0 + a1 * a1 + a2 * a2;
-}
-
-function vecDistSquared(a, anr, b, bnr) {
-  anr *= 3;
-  bnr *= 3;
-  let a0 = a[anr] - b[bnr];
-  let a1 = a[anr + 1] - b[bnr + 1];
-  let a2 = a[anr + 2] - b[bnr + 2];
-
-  return a0 * a0 + a1 * a1 + a2 * a2;
-}
-
-function vecDot(a, anr, b, bnr) {
-  anr *= 3;
-  bnr *= 3;
-  return a[anr] * b[bnr] + a[anr + 1] * b[bnr + 1] + a[anr + 2] * b[bnr + 2];
-}
 
 var physicsScene = {
   gravity: [0.0, 0.0, 0.0],
@@ -174,7 +33,7 @@ function onShowColl() {
 
 // --------------------------------------------------
 class Balls {
-  construct(radius, pos, vel, scene) {
+  constructor(radius, pos, vel, scene) {
     // pysics data
 
     this.radius = radius;
@@ -194,14 +53,14 @@ class Balls {
     var geometry = new THREE.SphereGeometry(radius, 8, 8);
     var material = new THREE.MeshPhongMaterial();
 
-    this.visMesh = new THREE.InstanceMesh(geometry, material, this.numBalls);
+    this.visMesh = new THREE.InstancedMesh(geometry, material, this.numBalls);
     this.visMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
     this.ballColor = new THREE.Color(0xff0000);
     this.ballCollisionColor = new THREE.Color(0xff8000);
 
     var colors = new Float32Array(3 * this.numBalls);
-    this.visMesh.instanceColor = new THREE.InstanceBufferAttribute(
+    this.visMesh.instanceColor = new THREE.InstancedBufferAttribute(
       colors,
       3,
       false,
@@ -302,6 +161,7 @@ class Balls {
     this.updateMesh();
   }
 }
+
 // --------------------------------------------------
 function initPhysics(scene) {
   var radius = 0.025;
@@ -316,7 +176,7 @@ function initPhysics(scene) {
 
   var pos = new Float32Array(3 * numX * numY * numZ);
   var vel = new Float32Array(3 * numX * numY * numZ);
-  vec.fill(0.0);
+  vel.fill(0.0);
 
   for (var xi = 0; xi < numX; xi++) {
     for (var yi = 0; yi < numY; yi++) {
@@ -374,7 +234,7 @@ function initThreeScene() {
 
   // Lights
   threeScene.add(new THREE.AmbientLight(0x505050));
-  threeScene.fog = new THREE.Fog(0x00000, 0, 15);
+  threeScene.fog = new THREE.Fog(0x000000, 0, 15);
 
   var spotLight = new THREE.SpotLight(0xffffff);
   spotLight.angle = Math.PI / 5;
@@ -417,7 +277,7 @@ function initThreeScene() {
   helper.material.opacity = 1.0;
   helper.material.transparent = true;
   helper.position.set(0, 0.002, 0);
-  treeScene.add(helper);
+  threeScene.add(helper);
 
   // Renderer
   renderer = new THREE.WebGLRenderer();
@@ -479,3 +339,12 @@ initThreeScene();
 onWindowResize();
 initPhysics();
 update();
+
+const runBtn = document.getElementById("buttonRun");
+runBtn.addEventListener("click", run);
+
+const restartBtn = document.getElementById("buttonRestart");
+restartBtn.addEventListener("click", restart);
+
+const checkColl = document.getElementById("checkColl");
+checkColl.addEventListener("change", onShowColl);
